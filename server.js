@@ -56,6 +56,24 @@ mongodb.MongoClient.connect(mongoURL, { useUnifiedTopology: true })
     const securityDB = db.collection(securityCollection);
     const appointmentDB = db.collection(appointmentCollection);
 
+    // Middleware for authentication and authorization
+    const authenticateUser = (req, res, next) => {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+      
+        if (!token) {
+          return res.status(401).send('Missing token');
+        }
+      
+        jwt.verify(token, secretKey, (err, user) => {
+          if (err) {
+            return res.status(403).send('Invalid or expired token');
+          }
+          req.user = user;
+          next();
+        });
+      };
+
 /**
  * @swagger
  * /register-staff:
@@ -147,7 +165,7 @@ app.post('/register-staff', async (req, res) => {
  *         description: Error storing token
  */
 
-app.post('/login-staff', async (req, res) => {
+app.post('/login-staff',authenticateUser, async (req, res) => {
   const { username, password } = req.body;
 
   const staff = await staffDB.findOne({ username });
@@ -205,7 +223,7 @@ app.post('/login-staff', async (req, res) => {
  *         description: Error storing token
  */
 
-    app.post('/login-security', async (req, res) => {
+    app.post('/login-security',authenticateUser, async (req, res) => {
       const { username, password } = req.body;
 
       const security = await securityDB.findOne({ username });
@@ -232,7 +250,7 @@ app.post('/login-staff', async (req, res) => {
     });
 
     // Middleware for authentication and authorization
-    const authenticateToken = (req, res, next) => {
+   /* const authenticateUser = (req, res, next) => {
       const authHeader = req.headers['authorization'];
       const token = authHeader && authHeader.split(' ')[1];
     
@@ -247,7 +265,7 @@ app.post('/login-staff', async (req, res) => {
         req.user = user;
         next();
       });
-    };
+    };*/
     
 
     // Create appointment
@@ -306,7 +324,7 @@ app.post('/login-staff', async (req, res) => {
  */
 
 
-    app.post('/appointments', async (req, res) => {
+    app.post('/appointments',authenticateUser, async (req, res) => {
       const {
         name,
         company,
@@ -370,7 +388,7 @@ app.post('/login-staff', async (req, res) => {
  */
 
 
-    app.get('/staff-appointments/:username', authenticateToken, async (req, res) => {
+    app.get('/staff-appointments/:username', authenticateUser, async (req, res) => {
       const { username } = req.params;
       const { role } = req.user;
     
@@ -425,7 +443,7 @@ app.post('/login-staff', async (req, res) => {
 
 
 
-app.put('/appointments/:name', authenticateToken, async (req, res) => {
+app.put('/appointments/:name', authenticateUser, async (req, res) => {
   const { name } = req.params;
   const { verification } = req.body;
   const { role } = req.user;
@@ -471,7 +489,7 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  */
 
 
-    app.delete('/appointments/:name', authenticateToken, async (req, res) => {
+    app.delete('/appointments/:name', authenticateUser, async (req, res) => {
       const { name } = req.params;
       const { role } = req.user;
     
@@ -521,7 +539,7 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  */
 
 
-    app.get('/appointments', authenticateToken, async (req, res) => {
+    app.get('/appointments', authenticateUser, async (req, res) => {
       const { name } = req.query;
       const { role } = req.user;
     
@@ -566,7 +584,7 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  */
 
 
-app.post('/logout', authenticateToken, async (req, res) => {
+app.post('/logout', authenticateUser, async (req, res) => {
     const { role } = req.user;
   
     // Depending on the role (staff or security), update the corresponding collection (staffDB or securityDB)

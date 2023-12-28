@@ -26,7 +26,7 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'VMS appointment',
+            title: 'Welcome to Visitor Management System',
             version: '1.0.0',
         },
     },
@@ -47,36 +47,27 @@ mongodb.MongoClient.connect(mongoURL, { useUnifiedTopology: true })
  * @swagger
  * /register-staff:
  *   post:
- *     summary: Register a new staff member
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *                 description: The username of the staff member
- *               password:
- *                 type: string
- *                 description: The password of the staff member
+ *     description: Register staff
+ *     parameters:
+ *       - name: username
+ *         description: Staff username
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: password
+ *         description: Staff password
+ *         in: formData
+ *         required: true
+ *         type: string
  *     responses:
- *       201:
- *         description: Successfully registered
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                   description: The JWT token for the registered staff member
- *       400:
- *         description: Bad Request
- *       500:
- *         description: Internal Server Error
+ *       200:
+ *         description: Staff registered successfully
+ *       403:
+ *         description: Invalid or unauthorized token
+ *       409:
+ *         description: Username already exists
  */
+
 app.post('/register-staff', async (req, res) => {
     try {
       const { username, password } = req.body;

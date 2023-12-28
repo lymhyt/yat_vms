@@ -29,7 +29,20 @@ const options = {
             title: 'Welcome to Visitor Management System',
             version: '1.0.0',
         },
-    },
+        components:{
+			securitySchemes:{
+				jwt:{
+					type: 'http',
+					scheme: 'bearer',
+					in: "header",
+					bearerFormat: 'JWT'
+				}
+			},
+            security:[{
+                "jwt": []
+            }]    
+        }
+        },
     apis: ['./server.js'],
 };
 const swaggerSpec = swaggerJsdoc(options);

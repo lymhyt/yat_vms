@@ -2,11 +2,11 @@ const express = require('express');
 const mongodb = require('mongodb');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const swaggerJsdoc = require ("swagger-jsdoc");
-const swaggerui = require ("swagger-ui-express");
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const secretKey = 'your-secret-key';
 
 // MongoDB connection URL
@@ -14,7 +14,7 @@ const mongoURL =
   'mongodb+srv://b022110148:Rafiah62@lymhyt.zvhvhpe.mongodb.net/?retryWrites=true&w=majority';
 
 // MongoDB database and collections names
-const dbName = 'appointment';
+const dbName = 'company appointment';
 const staffCollection = 'staff';
 const securityCollection = 'security';
 const appointmentCollection = 'appointments';
@@ -23,165 +23,125 @@ const appointmentCollection = 'appointments';
 app.use(express.json());
 
 const options = {
-    definition :{
-      openapi :"3.0.0",
-      info :{
-        title : "Company Management System",
-        version : "1.0.0",
-      },
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'VMS appointment',
+            version: '1.0.0',
+        },
     },
-    apis: ["./server.js"],
-  };
-  
-  
-  const specs = swaggerJsdoc(options)
-  app.use("/api-docs",swaggerui.serve,swaggerui.setup(specs)
-    )
-
-
+    apis: ['./server.js'],
+};
+const swaggerSpec = swaggerJsdoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // MongoDB connection
-mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
+mongodb.MongoClient.connect(mongoURL, { useUnifiedTopology: true })
   .then((client) => {
     const db = client.db(dbName);
     const staffDB = db.collection(staffCollection);
     const securityDB = db.collection(securityCollection);
     const appointmentDB = db.collection(appointmentCollection);
 
-// Middleware for authentication and authorization
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).send('Missing token');
-  }
-
-  jwt.verify(token, secretKey, (err, user) => {
-    if (err) {
-      return res.status(403).send('Invalid or expired token');
-    }
-    req.user = user;
-    next();
-  });
-};
-
-
-
 /**
  * @swagger
  * /register-staff:
  *   post:
- *     description: Register staff
- *     parameters:
- *       - name: username
- *         description: Staff username
- *         in: formData
- *         required: true
- *         type: string
- *       - name: password
- *         description: Staff password
- *         in: formData
- *         required: true
- *         type: string
+ *     summary: Register a new staff member
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The username of the staff member
+ *               password:
+ *                 type: string
+ *                 description: The password of the staff member
  *     responses:
- *       200:
- *         description: Staff registered successfully
- *       403:
- *         description: Invalid or unauthorized token
- *       409:
- *         description: Username already exists
+ *       201:
+ *         description: Successfully registered
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: The JWT token for the registered staff member
+ *       400:
+ *         description: Bad Request
+ *       500:
+ *         description: Internal Server Error
  */
+app.post('/register-staff', async (req, res) => {
+    try {
+      const { username, password } = req.body;
+  
+      // Check if the username already exists
+      const existingStaff = await staffDB.findOne({ username });
+      if (existingStaff) {
+        return res.status(400).json({ error: 'Username already exists' });
+      }
+  
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      // Create a new staff member
+      const newStaff = await staffDB.create({
+        username,
+        password: hashedPassword,
+      });
+  
+      // Generate JWT token
+      const token = jwt.sign({ username, role: 'staff' }, secretKey);
+  
+      // Update the staff member with the token
+      await staffDB.updateOne({ username }, { $set: { token } });
+  
+      res.status(201).json({ token });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+    
+        
 
-// Register staff
-app.post('/register-staff', authenticateToken, async (req, res) => {
-  const { role } = req.user;
-
-  if (role !== 'security') {
-    return res.status(403).send('Invalid or unauthorized token');
-  }
-
-  const { username, password } = req.body;
-
-  const existingStaff = await staffDB.findOne({ username });
-
-  if (existingStaff) {
-    return res.status(409).send('Username already exists');
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const staff = {
-    username,
-    password: hashedPassword,
-  };
-
-  staffDB
-    .insertOne(staff)
-    .then(() => {
-      res.status(200).send('Staff registered successfully');
-    })
-    .catch((error) => {
-      res.status(500).send('Error registering staff');
-    });
-});
-
-
-
-// Register security
-app.post('/register-security', async (req, res) => {
-  const { username, password } = req.body;
-
-  const existingSecurity = await securityDB.findOne({ username });
-
-  if (existingSecurity) {
-    return res.status(409).send('Username already exists');
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const security = {
-    username,
-    password: hashedPassword,
-  };
-
-  securityDB
-    .insertOne(security)
-    .then(() => {
-      res.status(200).send('Security registered successfully');
-    })
-    .catch((error) => {
-      res.status(500).send('Error registering security');
-    });
-});
-
+    // Staff login
 
 /**
  * @swagger
- * /register-security:
+ * /login-staff:
  *   post:
- *     description: Register security
- *     parameters:
- *       - name: username
- *         description: Security username
- *         in: formData
- *         required: true
- *         type: string
- *       - name: password
- *         description: Security password
- *         in: formData
- *         required: true
- *         type: string
+ *     summary: Login for Staff
+ *     description: Login with username and password
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
  *     responses:
- *       200:
- *         description: Security registered successfully
- *       409:
- *         description: Username already exists
- *       500:
- *         description: Error registering security
+ *       '200':
+ *         description: Login successful
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '400':
+ *         description: Invalid request body
+ *       '401':
+ *         description: Unauthorized - Invalid credentials
  */
-
-// Staff login
 app.post('/login-staff', async (req, res) => {
   const { username, password } = req.body;
 
@@ -209,37 +169,39 @@ app.post('/login-staff', async (req, res) => {
 });
 
 
+    // Security login
 /**
  * @swagger
- * /login-staff:
+ * /login-security:
  *   post:
- *     description: Staff login
- *     parameters:
- *       - name: username
- *         description: Staff username
- *         in: formData
- *         required: true
- *         type: string
- *       - name: password
- *         description: Staff password
- *         in: formData
- *         required: true
- *         type: string
+ *     summary: Security Login
+ *     description: Authenticate security with username and password
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
  *     responses:
- *       200:
- *         description: Successful login, returns token
- *         schema:
- *           type: object
- *           properties:
- *             token:
- *               type: string
- *       401:
- *         description: Invalid credentials
- *       500:
- *         description: Error storing token
+ *       '200':
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *       '401':
+ *         description: Unauthorized - Invalid credentials
+ *       '500':
+ *         description: Internal Server Error - Error storing token
  */
-
- // Security login
     app.post('/login-security', async (req, res) => {
       const { username, password } = req.body;
 
@@ -266,38 +228,70 @@ app.post('/login-staff', async (req, res) => {
         });
     });
 
+    // Middleware for authentication and authorization
+    const authenticateToken = (req, res, next) => {
+      const authHeader = req.headers['authorization'];
+      const token = authHeader && authHeader.split(' ')[1];
+    
+      if (!token) {
+        return res.status(401).send('Missing token');
+      }
+    
+      jwt.verify(token, secretKey, (err, user) => {
+        if (err) {
+          return res.status(403).send('Invalid or expired token');
+        }
+        req.user = user;
+        next();
+      });
+    };
+    
+
+    // Create appointment
 
 /**
  * @swagger
- * /login-security:
+ * /appointments:
  *   post:
- *     description: Security login
- *     parameters:
- *       - name: username
- *         description: Security username
- *         in: formData
- *         required: true
- *         type: string
- *       - name: password
- *         description: Security password
- *         in: formData
- *         required: true
- *         type: string
+ *     summary: Create Appointment
+ *     description: Create a new appointment
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               company:
+ *                 type: string
+ *               purpose:
+ *                 type: string
+ *               phoneNo:
+ *                 type: string
+ *               date:
+ *                 type: string
+ *               time:
+ *                 type: string
+ *               verification:
+ *                 type: boolean
+ *               staff:
+ *                 type: object
+ *                 properties:
+ *                   username:
+ *                     type: string
  *     responses:
- *       200:
- *         description: Successful login, returns token
- *         schema:
- *           type: object
- *           properties:
- *             token:
+ *       '200':
+ *         description: Appointment created successfully
+ *         content:
+ *           text/plain:
+ *             schema:
  *               type: string
- *       401:
- *         description: Invalid credentials
- *       500:
- *         description: Error storing token
+ *       '500':
+ *         description: Internal Server Error - Error creating appointment
  */
 
- // Create appointment
     app.post('/appointments', async (req, res) => {
       const {
         name,
@@ -331,134 +325,147 @@ app.post('/login-staff', async (req, res) => {
         });
     });
 
-
-/**
- * @swagger
- * /appointments:
- *   post:
- *     description: Create appointment
- *     parameters:
- *       - name: name
- *         description: Visitor's name
- *         in: formData
- *         required: true
- *         type: string
- *       - name: company
- *         description: Visitor's company
- *         in: formData
- *         required: true
- *         type: string
- *       - name: purpose
- *         description: Purpose of the visit
- *         in: formData
- *         required: true
- *         type: string
- *       - name: phoneNo
- *         description: Visitor's phone number
- *         in: formData
- *         required: true
- *         type: string
- *       - name: date
- *         description: Date of the appointment
- *         in: formData
- *         required: true
- *         type: string
- *       - name: time
- *         description: Time of the appointment
- *         in: formData
- *         required: true
- *         type: string
- *       - name: verification
- *         description: Verification status of the appointment
- *         in: formData
- *         required: true
- *         type: boolean
- *       - name: staff.username
- *         description: Username of the staff member creating the appointment
- *         in: formData
- *         required: true
- *         type: string
- *     responses:
- *       200:
- *         description: Appointment created successfully
- *       500:
- *         description: Error creating appointment
- */
-
-// Get staff's appointments
-app.get('/staff-appointments/:username', authenticateToken, async (req, res) => {
-  const { username } = req.params;
-  const { role, username: authenticatedUsername } = req.user;
-
-  if (role !== 'staff') {
-    return res.status(403).send('Invalid or unauthorized token');
-  }
-
-  if (username !== authenticatedUsername) {
-    return res.status(403).send('Invalid or unauthorized token');
-  }
-
-  appointmentDB
-    .find({ 'staff.username': username })
-    .toArray()
-    .then((appointments) => {
-      res.json(appointments);
-    })
-    .catch((error) => {
-      res.status(500).send('Error retrieving appointments');
-    });
-});
-
-
+    // Get staff's appointments
 /**
  * @swagger
  * /staff-appointments/{username}:
  *   get:
- *     description: Get staff's appointments
+ *     summary: Get Staff Appointments
+ *     description: Retrieve appointments for a specific staff member
  *     parameters:
- *       - name: username
- *         description: Staff username
- *         in: path
+ *       - in: path
+ *         name: username
+ *         description: Username of the staff member
  *         required: true
- *         type: string
- *       - name: Authorization
- *         description: Bearer token to authenticate the request
- *         in: header
- *         required: true
- *         type: string
- *     responses:
- *       200:
- *         description: Returns appointments for the specified staff member
  *         schema:
- *           type: array
- *           items:
- *             $ref: '#/definitions/Appointment'
- *       403:
- *         description: Invalid or unauthorized token
- *       500:
- *         description: Error retrieving appointments
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Appointments retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   name:
+ *                     type: string
+ *                   company:
+ *                     type: string
+ *                   purpose:
+ *                     type: string
+ *                   phoneNo:
+ *                     type: string
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                   time:
+ *                     type: string
+ *                   verification:
+ *                     type: boolean
+ *                   staff:
+ *                     type: object
+ *                     properties:
+ *                       username:
+ *                         type: string
+ *       '403':
+ *         description: Forbidden - Invalid or unauthorized token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '500':
+ *         description: Internal Server Error - Error retrieving appointments
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
  */
 
+    app.get('/staff-appointments/:username', authenticateToken, async (req, res) => {
+      const { username } = req.params;
+      const { role } = req.user;
+    
+      if (role !== 'staff') {
+        return res.status(403).send('Invalid or unauthorized token');
+      }
+    
+      appointmentDB
+        .find({ 'staff.username': username })
+        .toArray()
+        .then((appointments) => {
+          res.json(appointments);
+        })
+        .catch((error) => {
+          res.status(500).send('Error retrieving appointments');
+        });
+    });
+
 // Update appointment verification by visitor name
+
+/**
+ * @swagger
+ * /appointments/{name}:
+ *   put:
+ *     summary: Update Appointment Verification
+ *     description: Update the verification status of an appointment by name
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: name
+ *         required: true
+ *         description: Name of the appointment to be updated
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               verification:
+ *                 type: boolean
+ *     responses:
+ *       '200':
+ *         description: Appointment verification updated successfully
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '500':
+ *         description: Internal Server Error - Error updating appointment verification
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '403':
+ *         description: Forbidden - Invalid or unauthorized token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '401':
+ *         description: Unauthorized - Missing token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ */
+
 app.put('/appointments/:name', authenticateToken, async (req, res) => {
   const { name } = req.params;
   const { verification } = req.body;
-  const { role, username: authenticatedUsername } = req.user;
+  const { role } = req.user;
 
   if (role !== 'staff') {
     return res.status(403).send('Invalid or unauthorized token');
   }
 
-  // Find the appointment by name and staff username
-  const appointment = await appointmentDB.findOne({ name, 'staff.username': authenticatedUsername });
-
-  if (!appointment) {
-    return res.status(404).send('Appointment not found');
-  }
-
-  // Update the verification only if the staff member matches the creator
   appointmentDB
-    .updateOne({ name, 'staff.username': authenticatedUsername }, { $set: { verification } })
+    .updateOne({ name }, { $set: { verification } })
     .then(() => {
       res.status(200).send('Appointment verification updated successfully');
     })
@@ -467,40 +474,49 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
     });
 });
 
-
+    // Delete appointment
 /**
  * @swagger
  * /appointments/{name}:
- *   put:
- *     description: Update appointment verification by visitor name
+ *   delete:
+ *     summary: Delete Appointment
+ *     description: Delete an appointment by name
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
- *       - name: name
- *         description: Visitor's name
- *         in: path
+ *       - in: path
+ *         name: name
  *         required: true
- *         type: string
- *       - name: verification
- *         description: Updated verification status of the appointment
- *         in: formData
- *         required: true
- *         type: boolean
- *       - name: Authorization
- *         description: Bearer token to authenticate the request
- *         in: header
- *         required: true
- *         type: string
+ *         description: Name of the appointment to be deleted
+ *         schema:
+ *           type: string
  *     responses:
- *       200:
- *         description: Appointment verification updated successfully
- *       403:
- *         description: Invalid or unauthorized token
- *       404:
- *         description: Appointment not found
- *       500:
- *         description: Error updating appointment verification
+ *       '200':
+ *         description: Appointment deleted successfully
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '500':
+ *         description: Internal Server Error - Error deleting appointment
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '403':
+ *         description: Forbidden - Invalid or unauthorized token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '401':
+ *         description: Unauthorized - Missing token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
  */
 
-    // Delete appointment
     app.delete('/appointments/:name', authenticateToken, async (req, res) => {
       const { name } = req.params;
       const { role } = req.user;
@@ -519,32 +535,65 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
         });
     });
 
+    // Get all appointments (for security)
+
 /**
  * @swagger
- * /appointments/{name}:
- *   delete:
- *     description: Delete appointment
+ * /appointments:
+ *   get:
+ *     summary: Get Appointments (for security)
+ *     description: Retrieve appointments based on optional name filter, accessible only by security personnel
  *     parameters:
- *       - name: name
- *         description: Visitor's name
- *         in: path
- *         required: true
- *         type: string
- *       - name: Authorization
- *         description: Bearer token to authenticate the request
- *         in: header
- *         required: true
- *         type: string
+ *       - in: query
+ *         name: name
+ *         description: Optional parameter to filter appointments by name (case-insensitive)
+ *         schema:
+ *           type: string
  *     responses:
- *       200:
- *         description: Appointment deleted successfully
- *       403:
- *         description: Invalid or unauthorized token
- *       500:
- *         description: Error deleting appointment
+ *       '200':
+ *         description: Appointments retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   name:
+ *                     type: string
+ *                   company:
+ *                     type: string
+ *                   purpose:
+ *                     type: string
+ *                   phoneNo:
+ *                     type: string
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                   time:
+ *                     type: string
+ *                   verification:
+ *                     type: boolean
+ *                   staff:
+ *                     type: object
+ *                     properties:
+ *                       username:
+ *                         type: string
+ *       '403':
+ *         description: Forbidden - Invalid or unauthorized token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '500':
+ *         description: Internal Server Error - Error retrieving appointments
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
  */
 
- // Get all appointments (for security)
+
     app.get('/appointments', authenticateToken, async (req, res) => {
       const { name } = req.query;
       const { role } = req.user;
@@ -567,36 +616,49 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
     });
 
 
+// Logout
+
 /**
  * @swagger
- * /appointments:
- *   get:
- *     description: Get all appointments (for security)
- *     parameters:
- *       - name: name
- *         description: Filter appointments by visitor name
- *         in: query
- *         required: false
- *         type: string
- *       - name: Authorization
- *         description: Bearer token to authenticate the request
- *         in: header
- *         required: true
- *         type: string
+ * /logout:
+ *   post:
+ *     summary: User Logout
+ *     description: Logout the user and invalidate the token
+ *     security:
+ *       - BearerAuth: []
  *     responses:
- *       200:
- *         description: Returns all appointments (filtered if name is provided)
- *         schema:
- *           type: array
- *           items:
- *             $ref: '#/definitions/Appointment'
- *       403:
- *         description: Invalid or unauthorized token
- *       500:
- *         description: Error retrieving appointments
+ *       '200':
+ *         description: Logged out successfully
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '500':
+ *         description: Internal Server Error - Error logging out
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '403':
+ *         description: Forbidden - Invalid or unauthorized token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '401':
+ *         description: Unauthorized - Missing token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '404':
+ *         description: Not Found - Invalid role
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
  */
 
-// Logout
 app.post('/logout', authenticateToken, async (req, res) => {
     const { role } = req.user;
   
@@ -623,28 +685,7 @@ app.post('/logout', authenticateToken, async (req, res) => {
       res.status(500).send('Invalid role');
     }
   });
-
-
-/**
- * @swagger
- * /logout:
- *   post:
- *     description: Logout endpoint for staff or security
- *     parameters:
- *       - name: Authorization
- *         description: Bearer token to authenticate the request
- *         in: header
- *         required: true
- *         type: string
- *     responses:
- *       200:
- *         description: Logged out successfully
- *       403:
- *         description: Invalid role or unauthorized token
- *       500:
- *         description: Error logging out
- */
-
+  
     // Start the server
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
@@ -653,4 +694,3 @@ app.post('/logout', authenticateToken, async (req, res) => {
   .catch((error) => {
     console.log('Error connecting to MongoDB:', error);
   });
-

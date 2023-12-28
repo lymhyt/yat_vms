@@ -59,4 +59,4 @@ jobs:
           app-name: 'yatvms'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C74142DA5C29400FB4526AF222B9FDB1 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_97220686AC7E46DC98AB50460FD6F8D8 }}

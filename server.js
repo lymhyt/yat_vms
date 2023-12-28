@@ -108,31 +108,32 @@ app.post('/register-staff', async (req, res) => {
  * @swagger
  * /login-staff:
  *   post:
- *     summary: Login for Staff
- *     description: Login with username and password
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               password:
- *                 type: string
+ *     description: Staff login
+ *     parameters:
+ *       - name: username
+ *         description: Staff username
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: password
+ *         description: Staff password
+ *         in: formData
+ *         required: true
+ *         type: string
  *     responses:
- *       '200':
- *         description: Login successful
- *         content:
- *           text/plain:
- *             schema:
+ *       200:
+ *         description: Successful login, returns token
+ *         schema:
+ *           type: object
+ *           properties:
+ *             token:
  *               type: string
- *       '400':
- *         description: Invalid request body
- *       '401':
- *         description: Unauthorized - Invalid credentials
+ *       401:
+ *         description: Invalid credentials
+ *       500:
+ *         description: Error storing token
  */
+
 app.post('/login-staff', async (req, res) => {
   const { username, password } = req.body;
 

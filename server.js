@@ -5,13 +5,16 @@ const jwt = require('jsonwebtoken');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 
+
 const app = express();
 const port = process.env.PORT || 3000;
 const secretKey = 'your-secret-key';
 
+
 // MongoDB connection URL
 const mongoURL =
   'mongodb+srv://b022110148:Rafiah62@lymhyt.zvhvhpe.mongodb.net/?retryWrites=true&w=majority';
+
 
 // MongoDB database and collections names
 const dbName = 'company appointment';
@@ -19,8 +22,27 @@ const staffCollection = 'staff';
 const securityCollection = 'security';
 const appointmentCollection = 'appointments';
 
+
 // Middleware for parsing JSON data
 app.use(express.json());
+
+    // Middleware for authentication and authorization
+    const authenticateToken = (req, res, next) => {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+     
+        if (!token) {
+          return res.status(401).send('Missing token');
+        }
+     
+        jwt.verify(token, secretKey, (err, user) => {
+          if (err) {
+            return res.status(403).send('Invalid or expired token');
+          }
+          req.user = user;
+          next();
+        });
+      };
 
 const options = {
     definition: {
@@ -30,14 +52,14 @@ const options = {
             version: '1.0.0',
         },
         components:{
-			securitySchemes:{
-				jwt:{
-					type: 'http',
-					scheme: 'bearer',
-					in: "header",
-					bearerFormat: 'JWT'
-				}
-			},
+            securitySchemes:{
+                jwt:{
+                    type: 'http',
+                    scheme: 'bearer',
+                    in: "header",
+                    bearerFormat: 'JWT'
+                }
+            },
             security:[{
                 "jwt": []
             }]    
@@ -48,6 +70,7 @@ const options = {
 const swaggerSpec = swaggerJsdoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+
 // MongoDB connection
 mongodb.MongoClient.connect(mongoURL, { useUnifiedTopology: true })
   .then((client) => {
@@ -56,23 +79,6 @@ mongodb.MongoClient.connect(mongoURL, { useUnifiedTopology: true })
     const securityDB = db.collection(securityCollection);
     const appointmentDB = db.collection(appointmentCollection);
 
-    // Middleware for authentication and authorization
-    const authenticateUser = (req, res, next) => {
-        const authHeader = req.headers['authorization'];
-        const token = authHeader && authHeader.split(' ')[1];
-      
-        if (!token) {
-          return res.status(401).send('Missing token');
-        }
-      
-        jwt.verify(token, secretKey, (err, user) => {
-          if (err) {
-            return res.status(403).send('Invalid or expired token');
-          }
-          req.user = user;
-          next();
-        });
-      };
 
 /**
  * @swagger
@@ -99,41 +105,44 @@ mongodb.MongoClient.connect(mongoURL, { useUnifiedTopology: true })
  *         description: Username already exists
  */
 
+
 app.post('/register-staff', async (req, res) => {
     try {
       const { username, password } = req.body;
-  
+ 
       // Check if the username already exists
       const existingStaff = await staffDB.findOne({ username });
       if (existingStaff) {
         return res.status(400).json({ error: 'Username already exists' });
       }
-  
+ 
       // Hash the password
       const hashedPassword = await bcrypt.hash(password, 10);
-  
+ 
       // Create a new staff member
       const newStaff = await staffDB.create({
         username,
         password: hashedPassword,
       });
-  
+ 
       // Generate JWT token
       const token = jwt.sign({ username, role: 'staff' }, secretKey);
-  
+ 
       // Update the staff member with the token
       await staffDB.updateOne({ username }, { $set: { token } });
-  
+ 
       res.status(201).json({ token });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
   });
-    
-        
+   
+       
+
 
     // Staff login
+
 
 /**
  * @swagger
@@ -165,20 +174,26 @@ app.post('/register-staff', async (req, res) => {
  *         description: Error storing token
  */
 
-app.post('/login-staff',authenticateUser, async (req, res) => {
+
+app.post('/login-staff', async (req, res) => {
   const { username, password } = req.body;
 
+
   const staff = await staffDB.findOne({ username });
+
 
   if (!staff) {
     return res.status(401).send('Invalid credentials');
   }
 
+
   const passwordMatch = await bcrypt.compare(password, staff.password);
+
 
   if (!passwordMatch) {
     return res.status(401).send('Invalid credentials');
   }
+
 
   const token = jwt.sign({ username, role: 'staff' }, secretKey);
   staffDB
@@ -190,6 +205,8 @@ app.post('/login-staff',authenticateUser, async (req, res) => {
       res.status(500).send('Error storing token');
     });
 });
+
+
 
 
     // Security login
@@ -223,20 +240,26 @@ app.post('/login-staff',authenticateUser, async (req, res) => {
  *         description: Error storing token
  */
 
-    app.post('/login-security',authenticateUser, async (req, res) => {
+
+    app.post('/login-security', async (req, res) => {
       const { username, password } = req.body;
 
+
       const security = await securityDB.findOne({ username });
+
 
       if (!security) {
         return res.status(401).send('Invalid credentials');
       }
 
+
       const passwordMatch = await bcrypt.compare(password, security.password);
+
 
       if (!passwordMatch) {
         return res.status(401).send('Invalid credentials');
       }
+
 
       const token = security.token || jwt.sign({ username, role: 'security' }, secretKey);
       securityDB
@@ -249,15 +272,16 @@ app.post('/login-staff',authenticateUser, async (req, res) => {
         });
     });
 
-    // Middleware for authentication and authorization
-   /* const authenticateUser = (req, res, next) => {
+
+   /* // Middleware for authentication and authorization
+    const authenticateToken = (req, res, next) => {
       const authHeader = req.headers['authorization'];
       const token = authHeader && authHeader.split(' ')[1];
-    
+   
       if (!token) {
         return res.status(401).send('Missing token');
       }
-    
+   
       jwt.verify(token, secretKey, (err, user) => {
         if (err) {
           return res.status(403).send('Invalid or expired token');
@@ -266,9 +290,11 @@ app.post('/login-staff',authenticateUser, async (req, res) => {
         next();
       });
     };*/
-    
+   
+
 
     // Create appointment
+
 
 /**
  * @swagger
@@ -324,7 +350,9 @@ app.post('/login-staff',authenticateUser, async (req, res) => {
  */
 
 
-    app.post('/appointments',authenticateUser, async (req, res) => {
+
+
+    app.post('/appointments', async (req, res) => {
       const {
         name,
         company,
@@ -335,6 +363,7 @@ app.post('/login-staff',authenticateUser, async (req, res) => {
         verification,
         staff: { username },
       } = req.body;
+
 
       const appointment = {
         name,
@@ -347,6 +376,7 @@ app.post('/login-staff',authenticateUser, async (req, res) => {
         staff: { username },
       };
 
+
       appointmentDB
         .insertOne(appointment)
         .then(() => {
@@ -356,6 +386,7 @@ app.post('/login-staff',authenticateUser, async (req, res) => {
           res.status(500).send('Error creating appointment');
         });
     });
+
 
     // Get staff's appointments
 /**
@@ -388,14 +419,16 @@ app.post('/login-staff',authenticateUser, async (req, res) => {
  */
 
 
-    app.get('/staff-appointments/:username', authenticateUser, async (req, res) => {
+
+
+    app.get('/staff-appointments/:username', authenticateToken, async (req, res) => {
       const { username } = req.params;
       const { role } = req.user;
-    
+   
       if (role !== 'staff') {
         return res.status(403).send('Invalid or unauthorized token');
       }
-    
+   
       appointmentDB
         .find({ 'staff.username': username })
         .toArray()
@@ -407,7 +440,9 @@ app.post('/login-staff',authenticateUser, async (req, res) => {
         });
     });
 
+
 // Update appointment verification by visitor name
+
 
 /**
  * @swagger
@@ -443,14 +478,19 @@ app.post('/login-staff',authenticateUser, async (req, res) => {
 
 
 
-app.put('/appointments/:name', authenticateUser, async (req, res) => {
+
+
+
+app.put('/appointments/:name', authenticateToken, async (req, res) => {
   const { name } = req.params;
   const { verification } = req.body;
   const { role } = req.user;
 
+
   if (role !== 'staff') {
     return res.status(403).send('Invalid or unauthorized token');
   }
+
 
   appointmentDB
     .updateOne({ name }, { $set: { verification } })
@@ -461,6 +501,7 @@ app.put('/appointments/:name', authenticateUser, async (req, res) => {
       res.status(500).send('Error updating appointment verification');
     });
 });
+
 
     // Delete appointment
 /**
@@ -489,14 +530,16 @@ app.put('/appointments/:name', authenticateUser, async (req, res) => {
  */
 
 
-    app.delete('/appointments/:name', authenticateUser, async (req, res) => {
+
+
+    app.delete('/appointments/:name', authenticateToken, async (req, res) => {
       const { name } = req.params;
       const { role } = req.user;
-    
+   
       if (role !== 'staff') {
         return res.status(403).send('Invalid or unauthorized token');
       }
-    
+   
       appointmentDB
         .deleteOne({ name })
         .then(() => {
@@ -507,7 +550,9 @@ app.put('/appointments/:name', authenticateUser, async (req, res) => {
         });
     });
 
+
     // Get all appointments (for security)
+
 
 /**
  * @swagger
@@ -539,16 +584,18 @@ app.put('/appointments/:name', authenticateUser, async (req, res) => {
  */
 
 
-    app.get('/appointments', authenticateUser, async (req, res) => {
+
+
+    app.get('/appointments', authenticateToken, async (req, res) => {
       const { name } = req.query;
       const { role } = req.user;
-    
+   
       if (role !== 'security') {
         return res.status(403).send('Invalid or unauthorized token');
       }
-    
+   
       const filter = name ? { name: { $regex: name, $options: 'i' } } : {};
-    
+   
       appointmentDB
         .find(filter)
         .toArray()
@@ -561,7 +608,10 @@ app.put('/appointments/:name', authenticateUser, async (req, res) => {
     });
 
 
+
+
 // Logout
+
 
 /**
  * @swagger
@@ -584,9 +634,11 @@ app.put('/appointments/:name', authenticateUser, async (req, res) => {
  */
 
 
-app.post('/logout', authenticateUser, async (req, res) => {
+
+
+app.post('/logout', authenticateToken, async (req, res) => {
     const { role } = req.user;
-  
+ 
     // Depending on the role (staff or security), update the corresponding collection (staffDB or securityDB)
     if (role === 'staff') {
       staffDB
@@ -610,7 +662,7 @@ app.post('/logout', authenticateUser, async (req, res) => {
       res.status(500).send('Invalid role');
     }
   });
-  
+ 
     // Start the server
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);

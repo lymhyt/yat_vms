@@ -84,7 +84,7 @@ mongodb.MongoClient.connect(mongoURL, { useUnifiedTopology: true })
  * @swagger
  * /register-staff:
  *   post:
- *     description: Register staff
+ *     description: Register a staff member
  *     parameters:
  *       - name: username
  *         description: Staff username
@@ -96,15 +96,43 @@ mongodb.MongoClient.connect(mongoURL, { useUnifiedTopology: true })
  *         in: formData
  *         required: true
  *         type: string
+ *         format: password
+ *     consumes:
+ *       - application/x-www-form-urlencoded
+ *     produces:
+ *       - application/json
  *     responses:
- *       200:
+ *       201:
  *         description: Staff registered successfully
- *       403:
- *         description: Invalid or unauthorized token
- *       409:
- *         description: Username already exists
- */
-
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: JWT token for the registered staff member
+ *       400:
+ *         description: Username already exists or invalid request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Details of the error
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Details of the server error
+*/
 
 app.post('/register-staff', async (req, res) => {
     try {
@@ -133,9 +161,9 @@ app.post('/register-staff', async (req, res) => {
  
       res.status(201).json({ token });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
+        console.error('Error during staff registration:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
   });
    
        

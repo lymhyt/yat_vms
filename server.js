@@ -139,6 +139,11 @@ app.post('/register-staff', async (req, res) => {
   try {
     const { username, password } = req.body;
 
+    // Connect to MongoDB
+    await client.connect();
+    const db = client.db(dbName);
+    const staffDB = db.collection(staffCollection);
+
     // Check if the username already exists
     const existingStaff = await staffDB.findOne({ username });
     if (existingStaff) {
@@ -157,17 +162,19 @@ app.post('/register-staff', async (req, res) => {
     // Generate JWT token
     const token = jwt.sign({ username, role: 'staff' }, secretKey);
 
-    // Update the staff member with the token
+    // Update the staff member in the database with the generated token
     const updateResult = await staffDB.updateOne({ username }, { $set: { token } });
     if (updateResult.modifiedCount === 0) {
       throw new Error('Token update failed');
     }
 
-    // Return the token in the response
+    // Return the token in the response upon successful registration
     res.status(201).json({ token });
   } catch (error) {
     console.error('Error during staff registration:', error);
     res.status(500).json({ error: 'Internal Server Error' });
+  } finally {
+    await client.close(); // Close the MongoDB connection
   }
 });
 

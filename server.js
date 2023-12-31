@@ -121,24 +121,22 @@ mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
  * /register-staff:
  *   post:
  *     description: Register a staff member
- *     parameters:
- *       - name: username
- *         description: Staff username
- *         in: formData
- *         required: true
- *         type: string
- *       - name: password
- *         description: Staff password
- *         in: formData
- *         required: true
- *         type: string
- *         format: password
- *     consumes:
- *       - application/x-www-form-urlencoded
- *     produces:
- *       - application/json
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: Staff username
+ *               password:
+ *                 type: string
+ *                 description: Staff password
+ *                 format: password
  *     responses:
- *       201:
+ *       '201':
  *         description: Staff registered successfully
  *         content:
  *           application/json:
@@ -148,7 +146,7 @@ mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
  *                 token:
  *                   type: string
  *                   description: JWT token for the registered staff member
- *       400:
+ *       '400':
  *         description: Username already exists or invalid request
  *         content:
  *           application/json:
@@ -158,7 +156,7 @@ mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
  *                 error:
  *                   type: string
  *                   description: Details of the error
- *       500:
+ *       '500':
  *         description: Internal Server Error
  *         content:
  *           application/json:

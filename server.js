@@ -70,6 +70,18 @@ const options = {
 const swaggerSpec = swaggerJsdoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// Assuming securityDB is your database variable
+const securityDB = {
+  findOne: async function (filter) {
+    // Simulating finding a user in the database
+    return Promise.resolve(null); // Replace this with your actual DB query
+  },
+  insertOne: async function (security) {
+    // Simulating inserting a user into the database
+    // Ensure your actual insertion process handles errors and interacts with the database correctly
+    return Promise.reject(new Error('Simulated DB Insertion Error'));
+  },
+};
 
 // MongoDB connection
 mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
@@ -220,11 +232,10 @@ app.post('/register-security', async (req, res) => {
       password: hashedPassword,
     };
 
-    await securityDB.insertOne(security); // Await the insertion
-
+    await securityDB.insertOne(security);
     return res.status(200).send('Security registered successfully');
   } catch (error) {
-    console.error('Error registering security:', error); // Log the error for investigation
+    console.error('Error registering security:', error); // Log the specific error for debugging
     return res.status(500).send('Error registering security');
   }
 });

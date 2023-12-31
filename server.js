@@ -211,33 +211,39 @@ const saltRounds = 10;
  * /register-security:
  *   post:
  *     summary: Register a new security user
- *     consumes:
- *       - application/x-www-form-urlencoded
- *     parameters:
- *       - in: formData
- *         name: username
- *         description: Security username
- *         required: true
- *         type: string
- *       - in: formData
- *         name: password
- *         description: Security password
- *         required: true
- *         type: string
- *         format: password
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: Security username
+ *               password:
+ *                 type: string
+ *                 description: Security password
+ *                 format: password
  *     responses:
- *       200:
+ *       '200':
  *         description: Security registered successfully
- *         schema:
- *           type: string
- *       409:
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '409':
  *         description: Username already exists
- *         schema:
- *           type: string
- *       500:
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '500':
  *         description: Error registering security
- *         schema:
- *           type: string
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
  */
 
 app.post('/register-security', async (req, res) => {

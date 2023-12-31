@@ -216,9 +216,13 @@ app.post('/register-staff', async (req, res) => {
  */
 
 app.post('/register-security', async (req, res) => {
-  const { username, password } = req.body;
+ const { username, password } = req.body;
 
-  try {
+ if (!username || !password) {
+    return res.status(400).send('Bad request: username and password are required');
+ }
+
+ try {
     const existingSecurity = await securityDB.findOne({ username });
 
     if (existingSecurity) {
@@ -238,10 +242,10 @@ app.post('/register-security', async (req, res) => {
     } else {
       throw new Error('Error inserting security');
     }
-  } catch (error) {
-    console.error('Error registering security:', error);
+ } catch (error) {
+    console.error('Error registering security:', error.message);
     return res.status(500).send('Error registering security');
-  }
+ }
 });
 
 

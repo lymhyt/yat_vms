@@ -248,8 +248,8 @@ app.post('/register-security', async (req, res) => {
     }
   } catch (error) {
     console.error('Error registering security:', error); // Log the specific error for debugging
-    return res.status(500).send('Error registering security');
-  }
+    return res.status(500).send(`Error registering security: ${error.message}`);
+  }  
 });
 
 

@@ -148,28 +148,29 @@ app.post('/register-staff', async (req, res) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new staff member with hashed password
+    // Create a new staff member
     const newStaff = await staffDB.insertOne({
       username,
       password: hashedPassword,
-      token: '', // Initialize with an empty token
     });
 
     // Generate JWT token
     const token = jwt.sign({ username, role: 'staff' }, secretKey);
 
-    // Update the staff member with the generated token
+    // Update the staff member with the token
     const updateResult = await staffDB.updateOne({ username }, { $set: { token } });
     if (updateResult.modifiedCount === 0) {
       throw new Error('Token update failed');
     }
 
+    // Return the token in the response
     res.status(201).json({ token });
   } catch (error) {
     console.error('Error during staff registration:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 
 

@@ -184,6 +184,7 @@ app.post('/register-staff', async (req, res) => {
 
 const saltRounds = 10;
 
+
 /**
  * @swagger
  * /register-security:
@@ -191,8 +192,6 @@ const saltRounds = 10;
  *     summary: Register a new security user
  *     consumes:
  *       - application/x-www-form-urlencoded
- *     produces:
- *       - text/plain
  *     parameters:
  *       - in: formData
  *         name: username
@@ -204,6 +203,7 @@ const saltRounds = 10;
  *         description: Security password
  *         required: true
  *         type: string
+ *         format: password
  *     responses:
  *       200:
  *         description: Security registered successfully

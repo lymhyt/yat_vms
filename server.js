@@ -25,6 +25,7 @@ const appointmentCollection = 'appointments';
 
 // Middleware for parsing JSON data
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
     // Middleware for authentication and authorization
     const authenticateToken = (req, res, next) => {

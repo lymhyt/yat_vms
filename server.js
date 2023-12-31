@@ -227,18 +227,23 @@ app.post('/register-security', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const security = {
-      username,
+    // Replace this block with your actual database insertion logic
+    const insertedSecurity = await securityDB.insertOne({
+      username: username,
       password: hashedPassword,
-    };
+    });
 
-    await securityDB.insertOne(security);
-    return res.status(200).send('Security registered successfully');
+    if (insertedSecurity) {
+      return res.status(200).send('Security registered successfully');
+    } else {
+      throw new Error('Error inserting security');
+    }
   } catch (error) {
-    console.error('Error registering security:', error); // Log the specific error for debugging
+    console.error('Error registering security:', error);
     return res.status(500).send('Error registering security');
   }
 });
+
 
 
 

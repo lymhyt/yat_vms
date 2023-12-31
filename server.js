@@ -152,46 +152,34 @@ app.post('/register-staff', async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Connect to MongoDB
-    await client.connect();
-    const db = client.db(dbName);
-    const staffDB = db.collection(staffCollection);
-
-    // Check if the username already exists
     const existingStaff = await staffDB.findOne({ username });
     if (existingStaff) {
       return res.status(400).json({ error: 'Username already exists' });
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new staff member
     const newStaff = await staffDB.insertOne({
       username,
       password: hashedPassword,
     });
 
-    // Generate JWT token
     const token = jwt.sign({ username, role: 'staff' }, secretKey);
 
-    // Update the staff member in the database with the generated token
     const updateResult = await staffDB.updateOne({ username }, { $set: { token } });
     if (updateResult.modifiedCount === 0) {
       throw new Error('Token update failed');
     }
 
-    // Return the token in the response upon successful registration
     res.status(201).json({ token });
   } catch (error) {
     console.error('Error during staff registration:', error);
     res.status(500).json({ error: 'Internal Server Error' });
-  } finally {
-    await client.close(); // Close the MongoDB connection
   }
 });
 
-const saltRounds = 10;
+
+//const saltRounds = 10;
 
 /**
  * @swagger
@@ -229,32 +217,33 @@ const saltRounds = 10;
  */
 
 app.post('/register-security', async (req, res) => {
-  const { username, password } = req.body;
-
   try {
-    // Check if the username exists in the database
-    const existingSecurity = false; // Replace this with your database check
+    const { username, password } = req.body;
 
+    const existingSecurity = await securityDB.findOne({ username });
     if (existingSecurity) {
       return res.status(409).send('Username already exists');
     }
 
-    // Hash the password using bcrypt
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Insert the user into the database
-    const insertedSecurity = true; // Replace this with your database insertion logic
+    const insertedSecurity = await securityDB.insertOne({
+      username,
+      password: hashedPassword,
+    });
 
-    if (insertedSecurity) {
-      return res.status(200).send('Security registered successfully');
-    } else {
+    if (!insertedSecurity) {
       throw new Error('Error inserting security');
     }
+
+    res.status(200).send('Security registered successfully');
   } catch (error) {
-    console.error('Error registering security:', error); // Log the specific error for debugging
+    console.error('Error registering security:', error);
     return res.status(500).send(`Error registering security: ${error.message}`);
-  }  
+  }
 });
+
 
 
 

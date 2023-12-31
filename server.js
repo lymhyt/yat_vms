@@ -215,37 +215,18 @@ app.post('/register-staff', async (req, res) => {
  *         description: Error registering security
  */
 
-app.post('/register-security', async (req, res) => {
- const { username, password } = req.body;
+app.post('/register-security', (req, res) => {
+    const { username, password } = req.body;
 
- if (!username || !password) {
-    return res.status(400).send('Bad request: username and password are required');
- }
-
- try {
-    const existingSecurity = await securityDB.findOne({ username });
-
-    if (existingSecurity) {
-      return res.status(409).send('Username already exists');
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Bad request: username and password are required' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // TODO: Add your registration logic here
+    console.log('Username:', username);
+    console.log('Password:', password);
 
-    // Replace this block with your actual database insertion logic
-    const insertedSecurity = await securityDB.insertOne({
-      username: username,
-      password: hashedPassword,
-    });
-
-    if (insertedSecurity) {
-      return res.status(200).send('Security registered successfully');
-    } else {
-      throw new Error('Error inserting security');
-    }
- } catch (error) {
-    console.error('Error registering security:', error.message);
-    return res.status(500).send('Error registering security');
- }
+    res.status(200).json({ message: 'User registered successfully' });
 });
 
 

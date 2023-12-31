@@ -190,6 +190,8 @@ app.post('/register-staff', async (req, res) => {
   }
 });
 
+const saltRounds = 10;
+
 /**
  * @swagger
  * /register-security:
@@ -229,17 +231,18 @@ app.post('/register-security', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    // Your logic to check if the username exists in the database
+    // Check if the username exists in the database
     const existingSecurity = false; // Replace this with your database check
 
     if (existingSecurity) {
       return res.status(409).send('Username already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash the password using bcrypt
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Your logic to insert the user into the database
-    const insertedSecurity = true; // Replace this with your database insertion
+    // Insert the user into the database
+    const insertedSecurity = true; // Replace this with your database insertion logic
 
     if (insertedSecurity) {
       return res.status(200).send('Security registered successfully');

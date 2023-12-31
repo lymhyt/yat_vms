@@ -45,6 +45,29 @@ app.use(express.urlencoded({ extended: true }));
         });
       };
 
+// Example fetch request in a frontend application
+/*const userData = {
+  username: 'staff_username',
+  password: 'your_password_here',
+};
+
+fetch('/register-staff', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(userData),
+})
+  .then(response => {
+    // Handle response here (e.g., check for success or error status)
+    console.log(response);
+  })
+  .catch(error => {
+    // Handle error here
+    console.error('Error:', error);
+  });*/
+
+
 const options = {
     definition: {
         openapi: '3.0.0',

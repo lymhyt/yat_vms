@@ -194,25 +194,35 @@ app.post('/register-staff', async (req, res) => {
  * @swagger
  * /register-security:
  *   post:
- *     description: Register security
+ *     summary: Register a new security user
+ *     consumes:
+ *       - application/x-www-form-urlencoded
+ *     produces:
+ *       - text/plain
  *     parameters:
- *       - name: username
+ *       - in: formData
+ *         name: username
  *         description: Security username
- *         in: formData
  *         required: true
  *         type: string
- *       - name: password
+ *       - in: formData
+ *         name: password
  *         description: Security password
- *         in: formData
  *         required: true
  *         type: string
  *     responses:
  *       200:
  *         description: Security registered successfully
+ *         schema:
+ *           type: string
  *       409:
  *         description: Username already exists
+ *         schema:
+ *           type: string
  *       500:
  *         description: Error registering security
+ *         schema:
+ *           type: string
  */
 
 app.post('/register-security', (req, res) => {

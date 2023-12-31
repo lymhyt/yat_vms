@@ -80,94 +80,97 @@ mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
     const appointmentDB = db.collection(appointmentCollection);
 
 
-    /**
-     * @swagger
-     * /register-staff:
-     *   post:
-     *     description: Register a staff member
-     *     parameters:
-     *       - name: username
-     *         description: Staff username
-     *         in: formData
-     *         required: true
-     *         type: string
-     *       - name: password
-     *         description: Staff password
-     *         in: formData
-     *         required: true
-     *         type: string
-     *         format: password
-     *     consumes:
-     *       - application/x-www-form-urlencoded
-     *     produces:
-     *       - application/json
-     *     responses:
-     *       201:
-     *         description: Staff registered successfully
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 token:
-     *                   type: string
-     *                   description: JWT token for the registered staff member
-     *       400:
-     *         description: Username already exists or invalid request
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 error:
-     *                   type: string
-     *                   description: Details of the error
-     *       500:
-     *         description: Internal Server Error
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 error:
-     *                   type: string
-     *                   description: Details of the server error
-     */
+/**
+ * @swagger
+ * /register-staff:
+ *   post:
+ *     description: Register a staff member
+ *     parameters:
+ *       - name: username
+ *         description: Staff username
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: password
+ *         description: Staff password
+ *         in: formData
+ *         required: true
+ *         type: string
+ *         format: password
+ *     consumes:
+ *       - application/x-www-form-urlencoded
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       201:
+ *         description: Staff registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: JWT token for the registered staff member
+ *       400:
+ *         description: Username already exists or invalid request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Details of the error
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Details of the server error
+ */
 
-    app.post('/register-staff', async (req, res) => {
-      try {
-        const { username, password } = req.body;
 
-        // Check if the username already exists
-        const existingStaff = await staffDB.findOne({ username });
-        if (existingStaff) {
-          return res.status(400).json({ error: 'Username already exists' });
-        }
+app.post('/register-staff', async (req, res) => {
+  try {
+    const { username, password } = req.body;
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
+    // Check if the username already exists
+    const existingStaff = await staffDB.findOne({ username });
+    if (existingStaff) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
 
-        // Create a new staff member
-        const newStaff = await staffDB.insertOne({
-          username,
-          password: hashedPassword,
-        });
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Generate JWT token
-        const token = jwt.sign({ username, role: 'staff' }, secretKey);
-
-        // Update the staff member with the token
-        const updateResult = await staffDB.updateOne({ username }, { $set: { token } });
-        if (updateResult.modifiedCount === 0) {
-          throw new Error('Token update failed');
-        }
-
-        res.status(201).json({ token });
-      } catch (error) {
-        console.error('Error during staff registration:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-      }
+    // Create a new staff member with hashed password
+    const newStaff = await staffDB.insertOne({
+      username,
+      password: hashedPassword,
+      token: '', // Initialize with an empty token
     });
+
+    // Generate JWT token
+    const token = jwt.sign({ username, role: 'staff' }, secretKey);
+
+    // Update the staff member with the generated token
+    const updateResult = await staffDB.updateOne({ username }, { $set: { token } });
+    if (updateResult.modifiedCount === 0) {
+      throw new Error('Token update failed');
+    }
+
+    res.status(201).json({ token });
+  } catch (error) {
+    console.error('Error during staff registration:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 
        

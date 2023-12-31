@@ -17,7 +17,7 @@ const mongoURL =
 
 
 // MongoDB database and collections names
-const dbName = 'company appointment';
+const dbName = 'lymhyt';
 const staffCollection = 'staff';
 const securityCollection = 'security';
 const appointmentCollection = 'appointments';

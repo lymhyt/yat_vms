@@ -152,9 +152,13 @@ app.post('/register-staff', async (req, res) => {
   try {
     const { username, password } = req.body;
 
+    if (!password || password.trim() === '') {
+      return res.status(400).send('Password is required');
+    }
+
     const existingStaff = await staffDB.findOne({ username });
     if (existingStaff) {
-      return res.status(400).json({ error: 'Username already exists' });
+      return res.status(409).json({ error: 'Username already exists' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -177,7 +181,6 @@ app.post('/register-staff', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
 
 const saltRounds = 10;
 
@@ -220,6 +223,10 @@ app.post('/register-security', async (req, res) => {
   try {
     const { username, password } = req.body;
 
+    if (!password || password.trim() === '') {
+      return res.status(400).send('Password is required');
+    }
+
     const existingSecurity = await securityDB.findOne({ username });
     if (existingSecurity) {
       return res.status(409).send('Username already exists');
@@ -243,7 +250,6 @@ app.post('/register-security', async (req, res) => {
     return res.status(500).send(`Error registering security: ${error.message}`);
   }
 });
-
 
 
 

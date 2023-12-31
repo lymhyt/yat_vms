@@ -179,7 +179,7 @@ app.post('/register-staff', async (req, res) => {
 });
 
 
-//const saltRounds = 10;
+const saltRounds = 10;
 
 /**
  * @swagger

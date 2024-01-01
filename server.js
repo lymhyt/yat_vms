@@ -101,6 +101,8 @@ mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
  * /register-staff:
  *   post:
  *     description: Register a staff member
+ *     security:
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -149,13 +151,20 @@ mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
  */
 
 
-app.post('/register-staff', async (req, res) => {
-  try {
+app.post('/register-staff',authenticateToken, async (req, res) => {
+  const { role } = req.user;
+
+  if (role!=='security'){
+    return req.status(403).send('Invalid or uthorixed token');
+  }
+
+  const { username, password } = req.body;
+  /*try {}
     const { username, password } = req.body;
 
     if (!password || password.trim() === '') {
       return res.status(400).send('Password is required');
-    }
+    }*/
 
     const existingStaff = await staffDB.findOne({ username });
     if (existingStaff) {
@@ -164,12 +173,26 @@ app.post('/register-staff', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newStaff = await staffDB.insertOne({
+    const staff = {
       username,
       password: hashedPassword,
-    });
+    };
 
-    const token = jwt.sign({ username, role: 'staff' }, secretKey);
+    /*const newStaff = await staffDB.insertOne({
+      username,
+      password: hashedPassword,
+    });*/
+
+    staffDB
+    .insertOne(staff)
+    .then(() => {
+      res.status(200).send('Staff registered sucessfully');
+    })
+    .catch((error) => {
+      res.status(500).send('Error registered staff');
+    });
+  
+    /*const token = jwt.sign({ username, role: 'staff' }, secretKey);
 
     const updateResult = await staffDB.updateOne({ username }, { $set: { token } });
     if (updateResult.modifiedCount === 0) {
@@ -180,7 +203,7 @@ app.post('/register-staff', async (req, res) => {
   } catch (error) {
     console.error('Error during staff registration:', error);
     res.status(500).json({ error: 'Internal Server Error' });
-  }
+  }*/
 });
 
 const saltRounds = 10;

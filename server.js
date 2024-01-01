@@ -55,7 +55,7 @@ const options = {
             title: 'Welcome to Visitor Management System',
             version: '1.0.0',
         },
-        components:{
+        /*components:{
             securitySchemes:{
                 jwt:{
                     type: 'http',
@@ -67,7 +67,7 @@ const options = {
             security:[{
                 "jwt": []
             }]    
-        }
+        }*/
         },
     apis: ['./server.js'],
 };
@@ -95,6 +95,16 @@ mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
     const securityDB = db.collection(securityCollection);
     const appointmentDB = db.collection(appointmentCollection);
 
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
 
 /**
  * @swagger

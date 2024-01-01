@@ -100,7 +100,8 @@ mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
  * @swagger
  * /register-staff:
  *   post:
- *     description: Register a staff member
+ *     summary: Register a staff member
+ *     description: Register a new staff member with a username and password
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -118,18 +119,14 @@ mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
  *                 description: Staff password
  *                 format: password
  *     responses:
- *       '201':
+ *       200:
  *         description: Staff registered successfully
  *         content:
- *           application/json:
+ *           text/plain:
  *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Invalid or unauthorized token
- *       '400':
- *         description: Username already exists or invalid request
+ *               type: string
+ *       400:
+ *         description: Bad request or missing parameters
  *         content:
  *           application/json:
  *             schema:
@@ -138,8 +135,14 @@ mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
  *                 error:
  *                   type: string
  *                   description: Details of the error
- *       '500':
- *         description: Internal Server Error
+ *       403:
+ *         description: Invalid or unauthorized token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       409:
+ *         description: Username already exists
  *         content:
  *           application/json:
  *             schema:
@@ -147,7 +150,13 @@ mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Details of the server error
+ *                   description: Details of the error
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
  */
 
 

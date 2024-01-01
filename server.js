@@ -125,9 +125,9 @@ mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 error:
  *                   type: string
- *                   description: JWT token for the registered staff member
+ *                   example: Invalid or unauthorized token
  *       '400':
  *         description: Username already exists or invalid request
  *         content:

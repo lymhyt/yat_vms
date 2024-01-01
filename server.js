@@ -361,26 +361,29 @@ app.post('/login-staff', async (req, res) => {
  * @swagger
  * /login-security:
  *   post:
- *     description: Security login
- *     parameters:
- *       - name: username
- *         description: Security username
- *         in: formData
- *         required: true
- *         type: string
- *       - name: password
- *         description: Security password
- *         in: formData
- *         required: true
- *         type: string
+ *     summary: Login for security members
+ *     description: Login with username and password to get a token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
  *     responses:
  *       200:
- *         description: Successful login, returns token
- *         schema:
- *           type: object
- *           properties:
- *             token:
- *               type: string
+ *         description: Successful login
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
  *       401:
  *         description: Invalid credentials
  *       500:

@@ -507,7 +507,7 @@ app.post('/login-staff', async (req, res) => {
  *         schema:
  *           type: array
  *           items:
- *             $ref: '#/definitions/Appointment'
+ *             $ref: '#/appointments'
  *       403:
  *         description: Invalid or unauthorized token
  *       500:

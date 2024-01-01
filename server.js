@@ -557,24 +557,25 @@ app.post('/login-staff', async (req, res) => {
  */
 
 
-    app.get('/staff-appointments/:username', authenticateToken, async (req, res) => {
-      const { username } = req.params;
-      const { role } = req.user;
-   
-      if (role !== 'staff') {
-        return res.status(403).send('Invalid or unauthorized token');
-      }
-   
-      appointmentDB
-        .find({ 'staff.username': username })
-        .toArray()
-        .then((appointments) => {
-          res.json(appointments);
-        })
-        .catch((error) => {
-          res.status(500).send('Error retrieving appointments');
-        });
+app.get('/staff-appointments/:username', authenticateToken, async (req, res) => {
+  const { username } = req.params;
+  const { role } = req.user;
+
+  if (role !== 'staff') {
+    return res.status(403).send('Invalid or unauthorized token');
+  }
+
+  appointmentDB
+    .find({ 'staff.username': username })
+    .toArray()
+    .then((appointments) => {
+      res.json(appointments);
+    })
+    .catch((error) => {
+      res.status(500).send('Error retrieving appointments');
     });
+});
+
 
 
 // Update appointment verification by visitor name

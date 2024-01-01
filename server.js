@@ -28,7 +28,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
     // Middleware for authentication and authorization
-    const authenticateToken = (req, res, next) => {
+    function authenticateToken (req, res, next)  {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
      

@@ -493,8 +493,8 @@ app.post('/login-staff', async (req, res) => {
  * @swagger
  * /staff-appointments/{username}:
  *   get:
- *     summary: Get appointments for a staff member
- *     description: Retrieve appointments based on staff username
+ *     summary: Retrieve appointments for a staff member
+ *     description: Get appointments based on staff username
  *     parameters:
  *       - name: username
  *         in: path
@@ -513,7 +513,6 @@ app.post('/login-staff', async (req, res) => {
  *       500:
  *         description: Error retrieving appointments
  */
-
 
 
     app.get('/staff-appointments/:username', authenticateToken, async (req, res) => {

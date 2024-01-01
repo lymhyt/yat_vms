@@ -543,13 +543,15 @@ app.post('/login-staff', async (req, res) => {
  *         description: Username of the staff member
  *         required: true
  *         type: string
+ *     security:
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Successful retrieval of appointments
  *         schema:
  *           type: array
  *           items:
- *             $ref: '#/appointments'
+ *             $ref: '#/definitions/Appointment'
  *       403:
  *         description: Invalid or unauthorized token
  *       500:

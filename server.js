@@ -423,23 +423,6 @@ app.post('/login-staff', async (req, res) => {
     });
 
 
-   /* // Middleware for authentication and authorization
-    const authenticateToken = (req, res, next) => {
-      const authHeader = req.headers['authorization'];
-      const token = authHeader && authHeader.split(' ')[1];
-   
-      if (!token) {
-        return res.status(401).send('Missing token');
-      }
-   
-      jwt.verify(token, secretKey, (err, user) => {
-        if (err) {
-          return res.status(403).send('Invalid or expired token');
-        }
-        req.user = user;
-        next();
-      });
-    };*/
    
 
 
@@ -450,55 +433,42 @@ app.post('/login-staff', async (req, res) => {
  * @swagger
  * /appointments:
  *   post:
- *     description: Create appointment
- *     parameters:
- *       - name: name
- *         description: Visitor's name
- *         in: formData
- *         required: true
- *         type: string
- *       - name: company
- *         description: Visitor's company
- *         in: formData
- *         required: true
- *         type: string
- *       - name: purpose
- *         description: Purpose of the visit
- *         in: formData
- *         required: true
- *         type: string
- *       - name: phoneNo
- *         description: Visitor's phone number
- *         in: formData
- *         required: true
- *         type: string
- *       - name: date
- *         description: Date of the appointment
- *         in: formData
- *         required: true
- *         type: string
- *       - name: time
- *         description: Time of the appointment
- *         in: formData
- *         required: true
- *         type: string
- *       - name: verification
- *         description: Verification status of the appointment
- *         in: formData
- *         required: true
- *         type: boolean
- *       - name: staff.username
- *         description: Username of the staff member creating the appointment
- *         in: formData
- *         required: true
- *         type: string
+ *     summary: Create an appointment
+ *     description: Create a new appointment with details
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               company:
+ *                 type: string
+ *               purpose:
+ *                 type: string
+ *               phoneNo:
+ *                 type: string
+ *               date:
+ *                 type: string
+ *                 format: date
+ *               time:
+ *                 type: string
+ *                 format: time
+ *               verification:
+ *                 type: boolean
+ *               staff:
+ *                 type: object
+ *                 properties:
+ *                   username:
+ *                     type: string
  *     responses:
  *       200:
  *         description: Appointment created successfully
  *       500:
  *         description: Error creating appointment
  */
-
 
 
 
@@ -543,21 +513,17 @@ app.post('/login-staff', async (req, res) => {
  * @swagger
  * /staff-appointments/{username}:
  *   get:
- *     description: Get staff's appointments
+ *     summary: Get appointments for a staff member
+ *     description: Retrieve appointments based on staff username
  *     parameters:
  *       - name: username
- *         description: Staff username
  *         in: path
- *         required: true
- *         type: string
- *       - name: Authorization
- *         description: Bearer token to authenticate the request
- *         in: header
+ *         description: Username of the staff member
  *         required: true
  *         type: string
  *     responses:
  *       200:
- *         description: Returns appointments for the specified staff member
+ *         description: Successful retrieval of appointments
  *         schema:
  *           type: array
  *           items:
@@ -567,7 +533,6 @@ app.post('/login-staff', async (req, res) => {
  *       500:
  *         description: Error retrieving appointments
  */
-
 
 
 
@@ -598,35 +563,33 @@ app.post('/login-staff', async (req, res) => {
  * @swagger
  * /appointments/{name}:
  *   put:
- *     description: Update appointment verification by visitor name
+ *     summary: Update appointment verification
+ *     description: Update the verification status of an appointment
  *     parameters:
- *       - name: name
- *         description: Visitor's name
- *         in: path
+ *       - in: path
+ *         name: name
  *         required: true
- *         type: string
- *       - name: verification
- *         description: Updated verification status of the appointment
- *         in: formData
+ *         description: Name of the appointment
+ *         schema:
+ *           type: string
+ *       - in: body
+ *         name: verification
+ *         description: Verification status
  *         required: true
- *         type: boolean
- *       - name: Authorization
- *         description: Bearer token to authenticate the request
- *         in: header
- *         required: true
- *         type: string
+ *         schema:
+ *           type: object
+ *           properties:
+ *             verification:
+ *               type: string
+ *               description: Verification status of the appointment
  *     responses:
  *       200:
  *         description: Appointment verification updated successfully
  *       403:
  *         description: Invalid or unauthorized token
- *       404:
- *         description: Appointment not found
  *       500:
  *         description: Error updating appointment verification
  */
-
-
 
 
 
@@ -658,18 +621,15 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  * @swagger
  * /appointments/{name}:
  *   delete:
- *     description: Delete appointment
+ *     summary: Delete an appointment
+ *     description: Delete an appointment based on its name
  *     parameters:
- *       - name: name
- *         description: Visitor's name
- *         in: path
+ *       - in: path
+ *         name: name
  *         required: true
- *         type: string
- *       - name: Authorization
- *         description: Bearer token to authenticate the request
- *         in: header
- *         required: true
- *         type: string
+ *         description: Name of the appointment
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: Appointment deleted successfully
@@ -678,9 +638,6 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *       500:
  *         description: Error deleting appointment
  */
-
-
-
 
     app.delete('/appointments/:name', authenticateToken, async (req, res) => {
       const { name } = req.params;
@@ -708,21 +665,16 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  * @swagger
  * /appointments:
  *   get:
- *     description: Get all appointments (for security)
+ *     summary: Get appointments
+ *     description: Retrieve appointments based on optional name query parameter
  *     parameters:
  *       - name: name
- *         description: Filter appointments by visitor name
  *         in: query
- *         required: false
- *         type: string
- *       - name: Authorization
- *         description: Bearer token to authenticate the request
- *         in: header
- *         required: true
+ *         description: Optional - Name to filter appointments (case-insensitive)
  *         type: string
  *     responses:
  *       200:
- *         description: Returns all appointments (filtered if name is provided)
+ *         description: Successful retrieval of appointments
  *         schema:
  *           type: array
  *           items:
@@ -732,9 +684,6 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *       500:
  *         description: Error retrieving appointments
  */
-
-
-
 
     app.get('/appointments', authenticateToken, async (req, res) => {
       const { name } = req.query;
@@ -767,22 +716,14 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  * @swagger
  * /logout:
  *   post:
- *     description: Logout endpoint for staff or security
- *     parameters:
- *       - name: Authorization
- *         description: Bearer token to authenticate the request
- *         in: header
- *         required: true
- *         type: string
+ *     summary: Logout user
+ *     description: Logout the authenticated user, removing the token
  *     responses:
  *       200:
  *         description: Logged out successfully
- *       403:
- *         description: Invalid role or unauthorized token
  *       500:
  *         description: Error logging out
  */
-
 
 
 

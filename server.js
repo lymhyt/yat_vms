@@ -55,7 +55,7 @@ const options = {
             title: 'Welcome to Visitor Management System',
             version: '1.0.0',
         },
-        /*components:{
+        components:{
             securitySchemes:{
                 jwt:{
                     type: 'http',
@@ -67,7 +67,7 @@ const options = {
             security:[{
                 "jwt": []
             }]    
-        }*/
+        }
         },
     apis: ['./server.js'],
 };

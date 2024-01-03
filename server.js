@@ -441,6 +441,8 @@ app.post('/login-staff', async (req, res) => {
  *   post:
  *     summary: Create an appointment
  *     description: Create a new appointment with details
+ *     tags:
+ *       - Visitor
  *     requestBody:
  *       required: true
  *       content:

@@ -1,28 +1,26 @@
-### create visitors
-POST http://localhost:3000/register-staff
+POST https://yatvms.azurewebsites.net/register-staff
 Content-Type: application/json
-Authorization: Bearer eiyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJvYiIsInJvbGUiOiJzZWN1cml0eSIsImlhdCI6MTY4NzcwMDY3Mn0.MI7STn_YOshuXx43CYlDiSk1ZC0e4NqqB9eB_-ch8BM
-
+//Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InlhdCIsInJvbGUiOiJzZWN1cml0eSIsImlhdCI6MTcwNDI1NjA1NX0.6S3WS0bi3dEstTCQvsHKF3mhZdHbWGlo8nyqiSUM4ks
 {
-  "username": "john",
+  "username": "mir",
   "password": "123" 
 }
 // staff registration
 
 ###
 
-POST http://localhost:3000/register-security
+POST https://yatvms.azurewebsites.net/register-security
 Content-Type: application/json
 
 {
-  "username": "bob",
+  "username": "yat",
   "password": "123" 
 }
 // security registration
 
 ###
 
-POST http://localhost:3000/login-staff
+POST https://yatvms.azurewebsites.net/login-staff
 Content-Type: application/json
 
 {
@@ -33,18 +31,18 @@ Content-Type: application/json
 
 ###
 
-POST http://localhost:3000/login-security
+POST https://yatvms.azurewebsites.net/login-security
 Content-Type: application/json
 
 {
-  "username": "bob",
+  "username": "yat",
   "password": "123" 
 }
 // security login
 
 ###
 
-POST http://localhost:3000/appointments
+POST https://yatvms.azurewebsites.net/appointments
 Content-Type: application/json
 
 {
@@ -62,12 +60,12 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:3000/staff-appointments/john
+GET https://yatvms.azurewebsites.net/staff-appointments/john
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4iLCJyb2xlIjoic3RhZmYiLCJpYXQiOjE2ODgwMzU3MTJ9.lUyhw3FKnJWCa6cO1c_J-mEsrcR8miNWXjo5DnSHNf0
 
 ###
 
-PUT http://localhost:3000/appointments/yat
+PUT https://yatvms.azurewebsites.net/appointments/yat
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4iLCJyb2xlIjoic3RhZmYiLCJpYXQiOjE2ODgwMzUzMjR9.6wI_N4QpTqY-eixW3rzOsNew76vvlbPL3a2weZRcYsk
 Content-Type: application/json
 
@@ -75,17 +73,17 @@ Content-Type: application/json
 
 ###
 
-DELETE http://localhost:3000/appointments/yat
+DELETE https://yatvms.azurewebsites.net/appointments/yat
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImZhZGgiLCJyb2xlIjoic3RhZmYiLCJpYXQiOjE2ODc2ODM1NDh9.XkbTmIIEl9YSoZfuEJJCuhwDln_PU9pLrOktBOdVsok
 
 ####
 
-GET http://localhost:3000/appointments?name=wanzu
+GET https://yatvms.azurewebsites.net/appointments?name=wanzu
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJvYiIsInJvbGUiOiJzZWN1cml0eSIsImlhdCI6MTY4NzY4MzY5M30.nQT6xkT3gUoFpxjSEYTaX0Bti_sX1TKaXZuuFvOvSi4
 
 //optional
 ###
-POST http://localhost:3000/logout
+POST https://yatvms.azurewebsites.net/logout
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImZhZGgiLCJyb2xlIjoic3RhZmYiLCJpYXQiOjE2ODc3MDc4NTR9.7SH9XF5k48Zp4w0OQONs6nA0Enf0Rl1FMAb0DZD2fsU
 Content-Type: application/json
 

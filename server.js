@@ -566,58 +566,44 @@ app.get('/staff-appointments/:username', async (req, res) => {
  * @swagger
  * /appointments/{name}:
  *   put:
- *     summary: Update appointment verification
- *     tags: 
+ *     summary: Update appointment verification (public access).
+ *     tags:
  *       - Staff Appointments
- *     description: Update the verification status of an appointment
+ *     description: Update the verification status of an appointment.
  *     parameters:
  *       - in: path
  *         name: name
  *         required: true
- *         description: Name of the appointment
+ *         description: Name of the appointment.
  *         schema:
  *           type: string
  *       - in: body
  *         name: verification
- *         description: Verification status
+ *         description: Verification status.
  *         required: true
  *         schema:
  *           type: object
  *           properties:
  *             verification:
  *               type: string
- *               description: Verification status of the appointment
+ *               description: Verification status of the appointment.
  *     responses:
  *       200:
- *         description: Appointment verification updated successfully
- *       403:
- *         description: Invalid or unauthorized token
+ *         description: Appointment verification updated successfully.
  *       500:
- *         description: Error updating appointment verification
+ *         description: Error updating appointment verification.
  */
 
-
-
-
-app.put('/appointments/:name', authenticateToken, async (req, res) => {
+app.put('/appointments/:name', async (req, res) => {
   const { name } = req.params;
   const { verification } = req.body;
-  const { role } = req.user;
 
-
-  if (role !== 'staff') {
-    return res.status(403).send('Invalid or unauthorized token');
+  try {
+    await appointmentDB.updateOne({ name }, { $set: { verification } });
+    res.status(200).send('Appointment verification updated successfully');
+  } catch (error) {
+    res.status(500).send('Error updating appointment verification');
   }
-
-
-  appointmentDB
-    .updateOne({ name }, { $set: { verification } })
-    .then(() => {
-      res.status(200).send('Appointment verification updated successfully');
-    })
-    .catch((error) => {
-      res.status(500).send('Error updating appointment verification');
-    });
 });
 
 
@@ -626,10 +612,10 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  * @swagger
  * /appointments/{name}:
  *   delete:
- *     summary: Delete an appointment
+ *     summary: Delete an appointment (public access).
  *     tags:
  *       - Staff Appointments
- *     description: Delete an appointment based on its name
+ *     description: Delete an appointment based on its name.
  *     parameters:
  *       - in: path
  *         name: name
@@ -639,31 +625,21 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *           type: string
  *     responses:
  *       200:
- *         description: Appointment deleted successfully
- *       403:
- *         description: Invalid or unauthorized token
+ *         description: Appointment deleted successfully.
  *       500:
- *         description: Error deleting appointment
+ *         description: Error deleting appointment.
  */
 
-    app.delete('/appointments/:name', authenticateToken, async (req, res) => {
-      const { name } = req.params;
-      const { role } = req.user;
-   
-      if (role !== 'staff') {
-        return res.status(403).send('Invalid or unauthorized token');
-      }
-   
-      appointmentDB
-        .deleteOne({ name })
-        .then(() => {
-          res.status(200).send('Appointment deleted successfully');
-        })
-        .catch((error) => {
-          res.status(500).send('Error deleting appointment');
-        });
-    });
+app.delete('/appointments/:name', async (req, res) => {
+  const { name } = req.params;
 
+  try {
+    await appointmentDB.deleteOne({ name });
+    res.status(200).send('Appointment deleted successfully');
+  } catch (error) {
+    res.status(500).send('Error deleting appointment');
+  }
+});
 
     // Get all appointments (for security)
 
@@ -722,45 +698,30 @@ app.get('/appointments', async (req, res) => {
  * @swagger
  * /logout:
  *   post:
- *     summary: Logout user
+ *     summary: Logout endpoint (public access).
+ *     description: Clear token for the user to log out.
  *     tags:
- *       - Staff
- *     description: Logout the authenticated user, removing the token
+ *       - Authentication
  *     responses:
  *       200:
- *         description: Logged out successfully
+ *         description: Logged out successfully.
  *       500:
- *         description: Error logging out
+ *         description: Error logging out.
  */
 
+app.post('/logout', async (req, res) => {
+  // Assuming you're using username as a parameter to identify the user
+  const { username } = req.body;
 
-
-app.post('/logout', authenticateToken, async (req, res) => {
-    const { role } = req.user;
- 
-    // Depending on the role (staff or security), update the corresponding collection (staffDB or securityDB)
-    if (role === 'staff') {
-      staffDB
-        .updateOne({ username: req.user.username }, { $unset: { token: 1 } })
-        .then(() => {
-          res.status(200).send('Logged out successfully');
-        })
-        .catch(() => {
-          res.status(500).send('Error logging out');
-        });
-    } else if (role === 'security') {
-      securityDB
-        .updateOne({ username: req.user.username }, { $unset: { token: 1 } })
-        .then(() => {
-          res.status(200).send('Logged out successfully');
-        })
-        .catch(() => {
-          res.status(500).send('Error logging out');
-        });
-    } else {
-      res.status(500).send('Invalid role');
-    }
-  });
+  // Depending on the user role, update the corresponding collection (staffDB or securityDB)
+  // For demonstration purposes, I'm assuming staffDB, modify as needed
+  try {
+    await staffDB.updateOne({ username }, { $unset: { token: 1 } });
+    res.status(200).send('Logged out successfully');
+  } catch (error) {
+    res.status(500).send('Error logging out');
+  }
+});
  
     // Start the server
     app.listen(port, () => {

@@ -530,8 +530,6 @@ app.post('/login-staff', async (req, res) => {
  *         description: Username of the staff member to retrieve appointments for.
  *         schema:
  *           type: string
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: An array of appointments.
@@ -541,12 +539,6 @@ app.post('/login-staff', async (req, res) => {
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Appointment'
- *       403:
- *         description: Invalid or unauthorized token.
- *         content:
- *           text/plain:
- *             schema:
- *               type: string
  *       500:
  *         description: Error retrieving appointments.
  *         content:
@@ -556,13 +548,8 @@ app.post('/login-staff', async (req, res) => {
  */
 
 // Assuming 'app' is your Express app
-app.get('/staff-appointments/:username', /* authenticateToken, */ async (req, res) => {
+app.get('/staff-appointments/:username', async (req, res) => {
   const { username } = req.params;
-  const { role } = req.user;
-
-  if (role !== 'staff') {
-    return res.status(403).send('Invalid or unauthorized token');
-  }
 
   try {
     const appointments = await appointmentDB.find({ 'staff.username': username }).toArray();
@@ -571,7 +558,6 @@ app.get('/staff-appointments/:username', /* authenticateToken, */ async (req, re
     res.status(500).send('Error retrieving appointments');
   }
 });
-
 
 // Update appointment verification by visitor name
 
@@ -686,7 +672,7 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  * @swagger
  * /appointments:
  *   get:
- *     summary: Get appointments based on name(for security to view).
+ *     summary: Get appointments based on name (public access).
  *     description: Retrieve appointments based on a name query parameter.
  *     tags:
  *       - Appointments
@@ -697,8 +683,6 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *         description: Filter appointments by name (case-insensitive).
  *         schema:
  *           type: string
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: An array of appointments.
@@ -708,12 +692,6 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Appointment'
- *       403:
- *         description: Invalid or unauthorized token.
- *         content:
- *           text/plain:
- *             schema:
- *               type: string
  *       500:
  *         description: Error retrieving appointments.
  *         content:
@@ -722,13 +700,8 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *               type: string
  */
 
-app.get('/appointments', authenticateToken, async (req, res) => {
+app.get('/appointments', async (req, res) => {
   const { name } = req.query;
-  const { role } = req.user;
-
-  if (role !== 'security') {
-    return res.status(403).send('Invalid or unauthorized token');
-  }
 
   const filter = name ? { name: { $regex: name, $options: 'i' } } : {};
 
@@ -739,7 +712,6 @@ app.get('/appointments', authenticateToken, async (req, res) => {
     res.status(500).send('Error retrieving appointments');
   }
 });
-
 
 
 

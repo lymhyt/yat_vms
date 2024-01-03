@@ -605,6 +605,8 @@ app.get('/staff-appointments/:username', /* authenticateToken, */ async (req, re
  * /appointments/{name}:
  *   put:
  *     summary: Update appointment verification
+ *     tags: 
+ *       - Staff Appointments
  *     description: Update the verification status of an appointment
  *     parameters:
  *       - in: path
@@ -663,6 +665,8 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  * /appointments/{name}:
  *   delete:
  *     summary: Delete an appointment
+ *     tags:
+ *       - Staff Appoinments
  *     description: Delete an appointment based on its name
  *     parameters:
  *       - in: path
@@ -706,7 +710,7 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  * @swagger
  * /appointments:
  *   get:
- *     summary: Get appointments based on name.
+ *     summary: Get appointments based on name(for security to view).
  *     description: Retrieve appointments based on a name query parameter.
  *     tags:
  *       - Appointments
@@ -771,6 +775,8 @@ app.get('/appointments', authenticateToken, async (req, res) => {
  * /logout:
  *   post:
  *     summary: Logout user
+ *     tags:
+ *       - Staff
  *     description: Logout the authenticated user, removing the token
  *     responses:
  *       200:

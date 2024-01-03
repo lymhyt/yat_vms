@@ -701,7 +701,7 @@ app.get('/appointments', async (req, res) => {
  *     summary: Logout endpoint (public access).
  *     description: Clear token for the user to log out.
  *     tags:
- *       - Authentication
+ *       - Staff
  *     responses:
  *       200:
  *         description: Logged out successfully.

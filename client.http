@@ -1,6 +1,7 @@
 POST https://yatvms.azurewebsites.net/register-staff
 Content-Type: application/json
-//Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InlhdCIsInJvbGUiOiJzZWN1cml0eSIsImlhdCI6MTcwNDI1NjA1NX0.6S3WS0bi3dEstTCQvsHKF3mhZdHbWGlo8nyqiSUM4ks
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InlhbXkiLCJyb2xlIjoic2VjdXJpdHkiLCJpYXQiOjE3MDQyNTYyMzV9.u3udwSOH9q4avg-ow52ij8WV5Y7eLvnYWtJzp6Q0DqE
+
 {
   "username": "mir",
   "password": "123" 
@@ -13,7 +14,7 @@ POST https://yatvms.azurewebsites.net/register-security
 Content-Type: application/json
 
 {
-  "username": "yat",
+  "username": "yamy",
   "password": "123" 
 }
 // security registration
@@ -24,7 +25,7 @@ POST https://yatvms.azurewebsites.net/login-staff
 Content-Type: application/json
 
 {
-  "username": "john",
+  "username": "mir",
   "password": "123" 
 }
 // staff login
@@ -35,7 +36,7 @@ POST https://yatvms.azurewebsites.net/login-security
 Content-Type: application/json
 
 {
-  "username": "yat",
+  "username": "yamy",
   "password": "123" 
 }
 // security login
@@ -54,39 +55,40 @@ Content-Type: application/json
   "time": "12:00AM",
   "verification": "N/A",
   "staff": {
-    "username": "fadh"
+    "username": "mir"
   }
 }
+// create appointment
+###
+GET https://yatvms.azurewebsites.net/appointments
+
 
 ###
 
-GET https://yatvms.azurewebsites.net/staff-appointments/john
+GET https://yatvms.azurewebsites.net/staff-appointments/mir
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4iLCJyb2xlIjoic3RhZmYiLCJpYXQiOjE2ODgwMzU3MTJ9.lUyhw3FKnJWCa6cO1c_J-mEsrcR8miNWXjo5DnSHNf0
-
+// staff see appointment
 ###
 
 PUT https://yatvms.azurewebsites.net/appointments/yat
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4iLCJyb2xlIjoic3RhZmYiLCJpYXQiOjE2ODgwMzUzMjR9.6wI_N4QpTqY-eixW3rzOsNew76vvlbPL3a2weZRcYsk
+//Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4iLCJyb2xlIjoic3RhZmYiLCJpYXQiOjE2ODgwMzUzMjR9.6wI_N4QpTqY-eixW3rzOsNew76vvlbPL3a2weZRcYsk
 Content-Type: application/json
 
 { "verification": "verified" }
-
+//staff update appointment
 ###
 
 DELETE https://yatvms.azurewebsites.net/appointments/yat
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImZhZGgiLCJyb2xlIjoic3RhZmYiLCJpYXQiOjE2ODc2ODM1NDh9.XkbTmIIEl9YSoZfuEJJCuhwDln_PU9pLrOktBOdVsok
-
+//Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImZhZGgiLCJyb2xlIjoic3RhZmYiLCJpYXQiOjE2ODc2ODM1NDh9.XkbTmIIEl9YSoZfuEJJCuhwDln_PU9pLrOktBOdVsok
+//staff delete appointment
 ####
 
-GET https://yatvms.azurewebsites.net/appointments?name=wanzu
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJvYiIsInJvbGUiOiJzZWN1cml0eSIsImlhdCI6MTY4NzY4MzY5M30.nQT6xkT3gUoFpxjSEYTaX0Bti_sX1TKaXZuuFvOvSi4
 
-//optional
-###
 POST https://yatvms.azurewebsites.net/logout
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImZhZGgiLCJyb2xlIjoic3RhZmYiLCJpYXQiOjE2ODc3MDc4NTR9.7SH9XF5k48Zp4w0OQONs6nA0Enf0Rl1FMAb0DZD2fsU
 Content-Type: application/json
 
 {
-  "username": "fadh"
+  "username": "mir"
 }
+//logout staff

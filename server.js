@@ -653,7 +653,7 @@ app.delete('/appointments/:name', async (req, res) => {
  *     summary: Get appointments based on name (public access).
  *     description: Retrieve appointments based on a name query parameter.
  *     tags:
- *       - Appointments
+ *       - Visitor
  *     parameters:
  *       - in: query
  *         name: name

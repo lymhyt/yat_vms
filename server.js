@@ -698,46 +698,59 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  * @swagger
  * /appointments:
  *   get:
- *     summary: Get appointments
- *     description: Retrieve appointments based on optional name query parameter
+ *     summary: Get appointments based on name.
+ *     description: Retrieve appointments based on a name query parameter.
+ *     tags:
+ *       - Appointments
  *     parameters:
- *       - name: name
- *         in: query
- *         description: Optional - Name to filter appointments (case-insensitive)
- *         type: string
+ *       - in: query
+ *         name: name
+ *         required: false
+ *         description: Filter appointments by name (case-insensitive).
+ *         schema:
+ *           type: string
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Successful retrieval of appointments
- *         schema:
- *           type: array
- *           items:
- *             $ref: '#/definitions/Appointment'
+ *         description: An array of appointments.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Appointment'
  *       403:
- *         description: Invalid or unauthorized token
+ *         description: Invalid or unauthorized token.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
  *       500:
- *         description: Error retrieving appointments
+ *         description: Error retrieving appointments.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
  */
 
-    app.get('/appointments', authenticateToken, async (req, res) => {
-      const { name } = req.query;
-      const { role } = req.user;
-   
-      if (role !== 'security') {
-        return res.status(403).send('Invalid or unauthorized token');
-      }
-   
-      const filter = name ? { name: { $regex: name, $options: 'i' } } : {};
-   
-      appointmentDB
-        .find(filter)
-        .toArray()
-        .then((appointments) => {
-          res.json(appointments);
-        })
-        .catch((error) => {
-          res.status(500).send('Error retrieving appointments');
-        });
-    });
+app.get('/appointments', authenticateToken, async (req, res) => {
+  const { name } = req.query;
+  const { role } = req.user;
+
+  if (role !== 'security') {
+    return res.status(403).send('Invalid or unauthorized token');
+  }
+
+  const filter = name ? { name: { $regex: name, $options: 'i' } } : {};
+
+  try {
+    const appointments = await appointmentDB.find(filter).toArray();
+    res.json(appointments);
+  } catch (error) {
+    res.status(500).send('Error retrieving appointments');
+  }
+});
 
 
 

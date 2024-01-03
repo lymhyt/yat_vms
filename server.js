@@ -535,31 +535,42 @@ app.post('/login-staff', async (req, res) => {
  * @swagger
  * /staff-appointments/{username}:
  *   get:
- *     summary: Retrieve appointments for a staff member
- *     description: Get appointments based on staff username
+ *     summary: Get appointments for a specific staff member.
+ *     description: Retrieve appointments associated with a staff member.
+ *     tags:
+ *       - Staff Appointments
  *     parameters:
- *       - name: username
- *         in: path
- *         description: Username of the staff member
+ *       - in: path
+ *         name: username
  *         required: true
- *         type: string
- *     security:
- *       - BearerAuth: []
+ *         description: Username of the staff member to retrieve appointments for.
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
- *         description: Successful retrieval of appointments
- *         schema:
- *           type: array
- *           items:
- *             $ref: '#/definitions/Appointment'
+ *         description: An array of appointments.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Appointment'
  *       403:
- *         description: Invalid or unauthorized token
+ *         description: Invalid or unauthorized token.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
  *       500:
- *         description: Error retrieving appointments
+ *         description: Error retrieving appointments.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
  */
 
 
-app.get('/staff-appointments/:username', authenticateToken, async (req, res) => {
+app.get('/staff-appointments/:username'/*, authenticateToken*/,async (req, res) => {
   const { username } = req.params;
   const { role } = req.user;
 

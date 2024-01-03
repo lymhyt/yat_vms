@@ -546,6 +546,8 @@ app.post('/login-staff', async (req, res) => {
  *         description: Username of the staff member to retrieve appointments for.
  *         schema:
  *           type: string
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: An array of appointments.
@@ -554,7 +556,7 @@ app.post('/login-staff', async (req, res) => {
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/appointments'
+ *                 $ref: '#/components/schemas/Appointment'
  *       403:
  *         description: Invalid or unauthorized token.
  *         content:

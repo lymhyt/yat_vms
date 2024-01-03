@@ -321,7 +321,7 @@ app.post('/register-security', async (req, res) => {
  *     summary: Login for staff members.
  *     description: Authenticate staff member based on username and password.
  *     tags:
- *       - Authentication
+ *       - Staff
  *     requestBody:
  *       required: true
  *       content:

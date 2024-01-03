@@ -666,7 +666,7 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *   delete:
  *     summary: Delete an appointment
  *     tags:
- *       - Staff Appoinments
+ *       - Staff Appointments
  *     description: Delete an appointment based on its name
  *     parameters:
  *       - in: path

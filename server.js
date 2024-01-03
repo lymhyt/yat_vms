@@ -527,6 +527,8 @@ app.post('/login-staff', async (req, res) => {
  *     description: Retrieve appointments associated with a staff member.
  *     tags:
  *       - Staff Appointments
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: username
@@ -574,6 +576,8 @@ app.get('/staff-appointments/:username', async (req, res) => {
  *     tags:
  *       - Staff Appointments
  *     description: Update the verification status of an appointment.
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: name
@@ -620,6 +624,8 @@ app.put('/appointments/:name', async (req, res) => {
  *     tags:
  *       - Staff Appointments
  *     description: Delete an appointment based on its name.
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: name

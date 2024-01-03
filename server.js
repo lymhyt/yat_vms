@@ -569,8 +569,8 @@ app.post('/login-staff', async (req, res) => {
  *               type: string
  */
 
-
-app.get('/staff-appointments/:username'/*, authenticateToken*/,async (req, res) => {
+// Assuming 'app' is your Express app
+app.get('/staff-appointments/:username', /* authenticateToken, */ async (req, res) => {
   const { username } = req.params;
   const { role } = req.user;
 
@@ -578,17 +578,13 @@ app.get('/staff-appointments/:username'/*, authenticateToken*/,async (req, res) 
     return res.status(403).send('Invalid or unauthorized token');
   }
 
-  appointmentDB
-    .find({ 'staff.username': username })
-    .toArray()
-    .then((appointments) => {
-      res.json(appointments);
-    })
-    .catch((error) => {
-      res.status(500).send('Error retrieving appointments');
-    });
+  try {
+    const appointments = await appointmentDB.find({ 'staff.username': username }).toArray();
+    res.json(appointments);
+  } catch (error) {
+    res.status(500).send('Error retrieving appointments');
+  }
 });
-
 
 
 // Update appointment verification by visitor name

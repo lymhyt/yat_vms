@@ -61,7 +61,7 @@ Content-Type: application/json
 // create appointment
 ###
 GET https://yatvms.azurewebsites.net/appointments
-
+// visitor can view
 
 ###
 

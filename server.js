@@ -111,6 +111,8 @@ mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
  * /register-staff:
  *   post:
  *     summary: Register a staff member
+ *     tags:
+ *       - Staff
  *     description: Register a new staff member with a username and password
  *     security:
  *       - BearerAuth: []
@@ -233,6 +235,8 @@ const saltRounds = 10;
  * /register-security:
  *   post:
  *     summary: Register a new security user
+ *     tags:
+ *       - Security
  *     requestBody:
  *       required: true
  *       content:
@@ -315,6 +319,8 @@ app.post('/register-security', async (req, res) => {
  * /login-staff:
  *   post:
  *     summary: Login for staff members
+ *     tags:
+ *       - Staff
  *     description: Login with username and password to get a token
  *     requestBody:
  *       required: true
@@ -384,6 +390,8 @@ app.post('/login-staff', async (req, res) => {
  * /login-security:
  *   post:
  *     summary: Login for security members
+ *     tags:
+ *       - Security
  *     description: Login with username and password to get a token
  *     requestBody:
  *       required: true

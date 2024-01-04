@@ -1,5 +1,5 @@
 const express = require('express');
-//const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const mongodb = require('mongodb');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -13,14 +13,15 @@ const secretKey = 'your-secret-key';
 
 
 // MongoDB connection URL
-const mongoURL =
-  'mongodb+srv://b022110148:Rafiah62@lymhyt.akxroc9.mongodb.net/?retryWrites=true&w=majority';
+/*const mongoURL =
+  'mongodb+srv://b022110148:Rafiah62@lymhyt.akxroc9.mongodb.net/?retryWrites=true&w=majority';*/
 
-/* const credentials = 'C:/Users/user/Desktop/yat_vms/X509-cert-2560905792561748892.pem';
-  const client = new MongoClient('mongodb+srv://lymhyt.h5z8xg9.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority', {
-    tlsCertificateKeyFile: credentials,
-    serverApi: ServerApiVersion.v1
-  });*/
+ const credentials = 'C:/Users/user/Desktop/yat_vms/X509-cert-3169563892115926320.pem';
+ const client = new MongoClient('mongodb+srv://lymhyt.akxroc9.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority', {
+  tlsCertificateKeyFile: credentials,
+  serverApi: ServerApiVersion.v1
+});
+
   
 
 
@@ -96,18 +97,18 @@ const securityDB = {
 };
 
 // MongoDB connection
-/*client.connect()
+client.connect()
   .then(() => {
     const db = client.db(dbName);
     const staffDB = db.collection(staffCollection);
     const securityDB = db.collection(securityCollection);
-    const appointmentDB = db.collection(appointmentCollection);*/
-    mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
-    .then((client) => {
+    const appointmentDB = db.collection(appointmentCollection);
+   //mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
+    /*.then((client) => {
       const db = client.db(dbName);
       const staffDB = db.collection(staffCollection);
       const securityDB = db.collection(securityCollection);
-      const appointmentDB = db.collection(appointmentCollection);
+      const appointmentDB = db.collection(appointmentCollection);*/
 
 /**
  * @swagger

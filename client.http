@@ -2,6 +2,7 @@ POST https://yatvms.azurewebsites.net/register-staff
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InlhbXkiLCJyb2xlIjoic2VjdXJpdHkiLCJpYXQiOjE3MDQyNTYyMzV9.u3udwSOH9q4avg-ow52ij8WV5Y7eLvnYWtJzp6Q0DqE
 
+
 {
   "username": "mir",
   "password": "123" 
@@ -47,8 +48,8 @@ POST https://yatvms.azurewebsites.net/appointments
 Content-Type: application/json
 
 {
-  "name": "yat",
-  "company": "ABC Corporation",
+  "name": "yan",
+  "company": "utem",
   "purpose": "meeting",
   "phoneNo": "011223344",
   "date": "26-6-2023",
@@ -70,7 +71,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Impva
 // staff see appointment
 ###
 
-PUT https://yatvms.azurewebsites.net/appointments/yat
+PUT https://yatvms.azurewebsites.net/appointments/wede
 //Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4iLCJyb2xlIjoic3RhZmYiLCJpYXQiOjE2ODgwMzUzMjR9.6wI_N4QpTqY-eixW3rzOsNew76vvlbPL3a2weZRcYsk
 Content-Type: application/json
 
@@ -78,7 +79,7 @@ Content-Type: application/json
 //staff update appointment
 ###
 
-DELETE https://yatvms.azurewebsites.net/appointments/yat
+DELETE https://yatvms.azurewebsites.net/appointments/wii
 //Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImZhZGgiLCJyb2xlIjoic3RhZmYiLCJpYXQiOjE2ODc2ODM1NDh9.XkbTmIIEl9YSoZfuEJJCuhwDln_PU9pLrOktBOdVsok
 //staff delete appointment
 ####

@@ -1,5 +1,5 @@
 const express = require('express');
-const mongodb = require('mongodb');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const swaggerUi = require('swagger-ui-express');
@@ -12,8 +12,15 @@ const secretKey = 'your-secret-key';
 
 
 // MongoDB connection URL
-const mongoURL =
-  'mongodb+srv://b022110148:Rafiah62@lymhyt.zvhvhpe.mongodb.net/?retryWrites=true&w=majority';
+/*const mongoURL =
+  'mongodb+srv://lymhyt.h5z8xg9.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority';*/
+
+  const credentials = 'C:/Users/user/Desktop/yat_vms/X509-cert-2560905792561748892.pem';
+  const client = new MongoClient('mongodb+srv://lymhyt.h5z8xg9.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority', {
+    tlsCertificateKeyFile: credentials,
+    serverApi: ServerApiVersion.v1
+  });
+  
 
 
 // MongoDB database and collections names
@@ -88,8 +95,8 @@ const securityDB = {
 };
 
 // MongoDB connection
-mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
-  .then((client) => {
+client.connect()
+  .then(() => {
     const db = client.db(dbName);
     const staffDB = db.collection(staffCollection);
     const securityDB = db.collection(securityCollection);

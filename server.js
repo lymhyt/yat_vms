@@ -104,6 +104,15 @@ client.connect()
     const securityDB = db.collection(securityCollection);
     const appointmentDB = db.collection(appointmentCollection);
 
+    // Start the server
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  })
+  .catch((error) => {
+    console.log('Error connecting to MongoDB:', error);
+  });
+
         // Start the server
        /* app.listen(port, () => {
           console.log(`Server is running on port ${port}`);
@@ -118,6 +127,9 @@ client.connect()
       const staffDB = db.collection(staffCollection);
       const securityDB = db.collection(securityCollection);
       const appointmentDB = db.collection(appointmentCollection);*/
+
+
+
 
 /**
  * @swagger
@@ -757,10 +769,10 @@ app.post('/logout', async (req, res) => {
 });
  
     // Start the server
-   app.listen(port, () => {
+  /* app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     });
   })
   .catch((error) => {
     console.log('Error connecting to MongoDB:', error);
-  });
+  });*/

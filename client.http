@@ -15,7 +15,7 @@ POST https://yatvms.azurewebsites.net/register-security
 Content-Type: application/json
 
 {
-  "username": "hayati",
+  "username": "hayat",
   "password": "123" 
 }
 // security registration

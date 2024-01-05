@@ -122,13 +122,13 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
     const appointmentDB = db.collection(appointmentCollection);*/
 
     // Start the server
-    app.listen(port, () => {
+    /*app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     });
   })
   .catch((error) => {
     console.log('Error connecting to MongoDB:', error);
-  });
+  });*/
 
         // Start the server
        /* app.listen(port, () => {
@@ -277,54 +277,58 @@ app.post('/register-staff',authenticateToken, async (req, res) => {
 const saltRounds = 10;
 
 
-    /**
-     * @swagger
-     * /register-security:
-     *   post:
-     *     summary: Register a new security user
-     *     tags:
-     *       - Security
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             properties:
-     *               username:
-     *                 type: string
-     *               password:
-     *                 type: string
-     *     responses:
-     *       '200':
-     *         description: Security registered successfully
-     *       '409':
-     *         description: Username already exists
-     *       '500':
-     *         description: Error registering security
-     */
-    app.post('/register-security', async (req, res) => {
-      try {
-        const { username, password } = req.body;
+/**
+ * @swagger
+ * /register-security:
+ *   post:
+ *     summary: Register a new security user
+ *     tags:
+ *       - Security
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Security registered successfully
+ *       409:
+ *         description: Username already exists
+ *       500:
+ *         description: Error registering security
+ */
 
-        const existingSecurity = await securityDB.findOne({ username });
-        if (existingSecurity) {
-          return res.status(409).send('Username already exists');
-        }
+app.post('/register-security', async (req, res) => {
+  try {
+    const { username, password } = req.body;
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+    const existingSecurity = await securityDB.findOne({ username });
+    if (existingSecurity) {
+      return res.status(409).send('Username already exists');
+    }
 
-        await securityDB.insertOne({
-          username,
-          password: hashedPassword,
-        });
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-        res.status(200).send('Security registered successfully');
-      } catch (error) {
-        console.error('Error registering security:', error);
-        res.status(500).send('Error registering security');
-      }
-    });
+    const security = {
+      username,
+      password: hashedPassword,
+    };
+
+    await securityDB.insertOne(security);
+
+    res.status(200).send('Security registered successfully');
+  } catch (error) {
+    console.error('Error registering security:', error);
+    res.status(500).send('Error registering security');
+  }
+});
+
 
 
 
@@ -755,10 +759,10 @@ app.post('/logout', async (req, res) => {
 });
  
     // Start the server
-  /* app.listen(port, () => {
+   app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     });
   })
   .catch((error) => {
     console.log('Error connecting to MongoDB:', error);
-  });*/
+  });

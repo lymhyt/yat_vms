@@ -4,7 +4,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Inlhb
 
 
 {
-  "username": "mir",
+  "username": "mira",
   "password": "123" 
 }
 // staff registration
@@ -15,7 +15,7 @@ POST https://yatvms.azurewebsites.net/register-security
 Content-Type: application/json
 
 {
-  "username": "yamy",
+  "username": "hayati",
   "password": "123" 
 }
 // security registration

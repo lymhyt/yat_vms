@@ -14,7 +14,7 @@ const secretKey = 'your-secret-key';
 
 // MongoDB connection URL
 const mongoURL =
-  'mongodb+srv://b022110148:Rafiah62@lymhyt.akxroc9.mongodb.net/?retryWrites=true&w=majority';
+  'mongodb+srv://yatvms:Rafiah62@yatvms.863dyr5.mongodb.net/?retryWrites=true&w=majority';
 
  /*const credentials = 'C:/Users/user/Desktop/yat_vms/X509-cert-3169563892115926320.pem';
  const client = new MongoClient('mongodb+srv://lymhyt.akxroc9.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority', {
@@ -26,7 +26,7 @@ const mongoURL =
 
 
 // MongoDB database and collections names
-const dbName = 'lymhyt';
+const dbName = 'yatvms';
 const staffCollection = 'staff';
 const securityCollection = 'security';
 const appointmentCollection = 'appointments';
@@ -84,7 +84,7 @@ const swaggerSpec = swaggerJsdoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Assuming securityDB is your database variable
-const securityDB = {
+/*const securityDB = {
   findOne: async function (filter) {
     // Simulating finding a user in the database
     return Promise.resolve(null); // Replace this with your actual DB query
@@ -94,7 +94,17 @@ const securityDB = {
     // Ensure your actual insertion process handles errors and interacts with the database correctly
     return Promise.reject(new Error('Simulated DB Insertion Error'));
   },
-};
+};*/
+
+  // Security DB object with actual MongoDB operations
+  const securityDB = {
+    findOne: async function (filter) {
+      return await securityDB.findOne(filter); // Perform actual find operation
+    },
+    insertOne: async function (security) {
+      return await securityDB.insertOne(security); // Perform actual insertion
+    },
+  };
 
 // MongoDB connection
    mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
@@ -266,79 +276,78 @@ app.post('/register-staff',authenticateToken, async (req, res) => {
 const saltRounds = 10;
 
 
-/**
- * @swagger
- * /register-security:
- *   post:
- *     summary: Register a new security user
- *     tags:
- *       - Security
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *                 description: Security username
- *               password:
- *                 type: string
- *                 description: Security password
- *                 format: password
- *     responses:
- *       '200':
- *         description: Security registered successfully
- *         content:
- *           text/plain:
- *             schema:
- *               type: string
- *       '409':
- *         description: Username already exists
- *         content:
- *           text/plain:
- *             schema:
- *               type: string
- *       '500':
- *         description: Error registering security
- *         content:
- *           text/plain:
- *             schema:
- *               type: string
- */
+    /**
+     * @swagger
+     * /register-security:
+     *   post:
+     *     summary: Register a new security user
+     *     tags:
+     *       - Security
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               username:
+     *                 type: string
+     *                 description: Security username
+     *               password:
+     *                 type: string
+     *                 description: Security password
+     *                 format: password
+     *     responses:
+     *       '200':
+     *         description: Security registered successfully
+     *         content:
+     *           text/plain:
+     *             schema:
+     *               type: string
+     *       '409':
+     *         description: Username already exists
+     *         content:
+     *           text/plain:
+     *             schema:
+     *               type: string
+     *       '500':
+     *         description: Error registering security
+     *         content:
+     *           text/plain:
+     *             schema:
+     *               type: string
+     */
+    app.post('/register-security', async (req, res) => {
+      try {
+        const { username, password } = req.body;
 
-app.post('/register-security', async (req, res) => {
-  try {
-    const { username, password } = req.body;
+        if (!password || password.trim() === '') {
+          return res.status(400).send('Password is required');
+        }
 
-    if (!password || password.trim() === '') {
-      return res.status(400).send('Password is required');
-    }
+        const existingSecurity = await securityDB.findOne({ username });
+        if (existingSecurity) {
+          return res.status(409).send('Username already exists');
+        }
 
-    const existingSecurity = await securityDB.findOne({ username });
-    if (existingSecurity) {
-      return res.status(409).send('Username already exists');
-    }
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+        // Insert the user into the database
+        const insertedSecurity = await securityDB.insertOne({
+          username,
+          password: hashedPassword,
+        });
 
-    // Insert the user into the database
-    const insertedSecurity = await securityDB.insertOne({
-      username,
-      password: hashedPassword,
+        if (!insertedSecurity || insertedSecurity.insertedCount === 0) {
+          throw new Error('Error inserting security');
+        }
+
+        res.status(200).send('Security registered successfully');
+      } catch (error) {
+        console.error('Error registering security:', error);
+        return res.status(500).send(`Error registering security: ${error.message}`);
+      }
     });
-
-    if (!insertedSecurity) {
-      throw new Error('Error inserting security');
-    }
-
-    res.status(200).send('Security registered successfully');
-  } catch (error) {
-    console.error('Error registering security:', error);
-    return res.status(500).send(`Error registering security: ${error.message}`);
-  }
-});
 
 
 

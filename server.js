@@ -105,13 +105,13 @@ client.connect()
     const appointmentDB = db.collection(appointmentCollection);
 
         // Start the server
-        app.listen(port, () => {
+       /* app.listen(port, () => {
           console.log(`Server is running on port ${port}`);
         });
       })
       .catch((error) => {
         console.log('Error connecting to MongoDB:', error);
-      });
+      });*/
    //mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
     /*.then((client) => {
       const db = client.db(dbName);
@@ -757,10 +757,10 @@ app.post('/logout', async (req, res) => {
 });
  
     // Start the server
-/*    app.listen(port, () => {
+   app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     });
   })
   .catch((error) => {
     console.log('Error connecting to MongoDB:', error);
-  });*/
+  });

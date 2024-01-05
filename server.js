@@ -84,6 +84,7 @@ const swaggerSpec = swaggerJsdoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Assuming securityDB is your database variable
+//const securityDB = db.collection(securityCollection);
 /*const securityDB = {
   findOne: async function (filter) {
     // Simulating finding a user in the database
@@ -97,14 +98,14 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 };*/
 
   // Security DB object with actual MongoDB operations
-  const securityDB = {
+  /*const securityDB = {
     findOne: async function (filter) {
-      return await securityDB.findOne(filter); // Perform actual find operation
+      return await securityCollection.findOne(filter);
     },
     insertOne: async function (security) {
-      return await securityDB.insertOne(security); // Perform actual insertion
+      return await securityCollection.insertOne(security);
     },
-  };
+  };*/
 
 // MongoDB connection
    mongodb.MongoClient.connect(mongoURL/*, { useUnifiedTopology: true }*/)
@@ -292,63 +293,38 @@ const saltRounds = 10;
      *             properties:
      *               username:
      *                 type: string
-     *                 description: Security username
      *               password:
      *                 type: string
-     *                 description: Security password
-     *                 format: password
      *     responses:
      *       '200':
      *         description: Security registered successfully
-     *         content:
-     *           text/plain:
-     *             schema:
-     *               type: string
      *       '409':
      *         description: Username already exists
-     *         content:
-     *           text/plain:
-     *             schema:
-     *               type: string
      *       '500':
      *         description: Error registering security
-     *         content:
-     *           text/plain:
-     *             schema:
-     *               type: string
      */
     app.post('/register-security', async (req, res) => {
       try {
         const { username, password } = req.body;
-
-        if (!password || password.trim() === '') {
-          return res.status(400).send('Password is required');
-        }
 
         const existingSecurity = await securityDB.findOne({ username });
         if (existingSecurity) {
           return res.status(409).send('Username already exists');
         }
 
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Insert the user into the database
-        const insertedSecurity = await securityDB.insertOne({
+        await securityDB.insertOne({
           username,
           password: hashedPassword,
         });
 
-        if (!insertedSecurity || insertedSecurity.insertedCount === 0) {
-          throw new Error('Error inserting security');
-        }
-
         res.status(200).send('Security registered successfully');
       } catch (error) {
         console.error('Error registering security:', error);
-        return res.status(500).send(`Error registering security: ${error.message}`);
+        res.status(500).send('Error registering security');
       }
     });
-
 
 
 

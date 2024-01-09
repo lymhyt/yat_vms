@@ -276,93 +276,6 @@ app.post('/register-staff',authenticateToken, async (req, res) => {
 
 const saltRounds = 10;
 
-/**
- * @swagger
- * /register-staff-no:
- *   post:
- *     summary: Register a new staff member without token
- *     tags:
- *       - Staff
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: Staff registered successfully
- *       400:
- *         description: Bad request or missing parameters
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Details of the error
- *       409:
- *         description: Username already exists
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Details of the error
- *       500:
- *         description: Internal Server Error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Details of the error
- */
-
-
-app.post('/register-staff-no', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-
-    const existingStaff = await staffDB.findOne({ username });
-    if (existingStaff) {
-      return res.status(409).json({ error: 'Username already exists' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const staff = {
-      username,
-      password: hashedPassword,
-    };
-
-    staffDB
-      .insertOne(staff)
-      .then(() => {
-        res.status(200).send('Staff registered successfully');
-      })
-      .catch(() => {
-        res.status(500).send('Error registering staff');
-      });
-
-  } catch (error) {
-    console.error('Error during staff registration:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-
-
 
 /**
  * @swagger
@@ -844,6 +757,110 @@ app.post('/logout', async (req, res) => {
     res.status(500).send('Error logging out');
   }
 });
+
+/////////////////////// TESTING /////////////////////
+
+const testingMongoURL = 'mongodb+srv://yatvms:Rafiah62@yatvms.863dyr5.mongodb.net/?retryWrites=true&w=majority';
+
+// MongoDB connection for testing purposes
+const testingClient = new mongodb.MongoClient(testingMongoURL/*, { useUnifiedTopology: true }*/);
+
+testingClient.connect()
+  .then((testClient) => {
+    const testDB = testClient.db('STAFF NO TOKEN');
+    const testStaffDB = testDB.collection('test_staff_collection');
+  });
+    // API endpoint for registering staff without requiring a token
+
+    /**
+ * @swagger
+ * /register-staff-no:
+ *   post:
+ *     summary: Register a new staff member (No token required - Testing API).
+ *     description: Register a new staff member for testing purposes without requiring a security token.
+ *     tags:
+ *       - Testing
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: Username of the new staff member
+ *               password:
+ *                 type: string
+ *                 description: Password for the new staff member
+ *     responses:
+ *       200:
+ *         description: Staff registered successfully in the testing database
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       400:
+ *         description: Bad request or missing parameters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Details of the error
+ *       409:
+ *         description: Username already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Details of the error
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ */
+
+    app.post('/register-staff-no', async (req, res) => {
+      try {
+        const { username, password } = req.body;
+
+        const existingStaff = await testStaffDB.findOne({ username });
+        if (existingStaff) {
+          return res.status(409).json({ error: 'Username already exists' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const staff = {
+          username,
+          password: hashedPassword,
+        };
+
+        testStaffDB
+          .insertOne(staff)
+          .then(() => {
+            res.status(200).send('Staff registered successfully in the testing database');
+          })
+          .catch(() => {
+            res.status(500).send('Error registering staff in the testing database');
+          });
+
+      } catch (error) {
+        console.error('Error during staff registration in the testing database:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+    });
+
+
+/////////////////////////////////////////////////////
  
     // Start the server
    app.listen(port, () => {

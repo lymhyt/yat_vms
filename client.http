@@ -1,13 +1,21 @@
 POST https://yatvms.azurewebsites.net/register-staff
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InlhbXkiLCJyb2xlIjoic2VjdXJpdHkiLCJpYXQiOjE3MDQyNTYyMzV9.u3udwSOH9q4avg-ow52ij8WV5Y7eLvnYWtJzp6Q0DqE
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhheWF0Iiwicm9sZSI6InNlY3VyaXR5IiwiaWF0IjoxNzA0NDcwMjA5fQ.Dd_MMGXynjA3oa73_0Lmc9KZYB4Z3yJ6oFAC7S3XqC4
 
 {
-  "username": "mira",
+  "username": "nina",
   "password": "123" 
 }
 // staff registration
+###
+POST https://yatvms.azurewebsites.net/register-staff-no
+Content-Type: application/json
+
+{
+  "username": "example",
+  "password": "123"
+}
+// staff registration without approval
 
 ###
 
@@ -26,7 +34,7 @@ POST https://yatvms.azurewebsites.net/login-staff
 Content-Type: application/json
 
 {
-  "username": "mir",
+  "username": "mira",
   "password": "123" 
 }
 // staff login
@@ -37,7 +45,7 @@ POST https://yatvms.azurewebsites.net/login-security
 Content-Type: application/json
 
 {
-  "username": "yamy",
+  "username": "hayat",
   "password": "123" 
 }
 // security login

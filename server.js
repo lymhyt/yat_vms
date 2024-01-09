@@ -276,6 +276,88 @@ app.post('/register-staff',authenticateToken, async (req, res) => {
 
 const saltRounds = 10;
 
+/**
+ * @swagger
+ * /register-staff-no:
+ *   post:
+ *     summary: Register a new staff member without approval
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Staff registered successfully
+ *       400:
+ *         description: Bad request or missing parameters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Details of the error
+ *       409:
+ *         description: Username already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Details of the error
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Details of the error
+ */
+
+app.post('/register-staff-no', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    const existingStaff = await staffDB.findOne({ username });
+    if (existingStaff) {
+      return res.status(409).json({ error: 'Username already exists' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const staff = {
+      username,
+      password: hashedPassword,
+    };
+
+    staffDB
+      .insertOne(staff)
+      .then(() => {
+        res.status(200).send('Staff registered successfully');
+      })
+      .catch((error) => {
+        res.status(500).send('Error registering staff');
+      });
+
+  } catch (error) {
+    console.error('Error during staff registration:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 /**
  * @swagger

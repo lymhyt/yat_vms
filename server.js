@@ -280,7 +280,9 @@ const saltRounds = 10;
  * @swagger
  * /register-staff-no:
  *   post:
- *     summary: Register a new staff member without approval
+ *     summary: Register a new staff member without token
+ *     tags:
+ *       - Staff
  *     requestBody:
  *       required: true
  *       content:
@@ -327,6 +329,7 @@ const saltRounds = 10;
  *                   description: Details of the error
  */
 
+
 app.post('/register-staff-no', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -348,7 +351,7 @@ app.post('/register-staff-no', async (req, res) => {
       .then(() => {
         res.status(200).send('Staff registered successfully');
       })
-      .catch((error) => {
+      .catch(() => {
         res.status(500).send('Error registering staff');
       });
 
@@ -357,6 +360,8 @@ app.post('/register-staff-no', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
 
 
 /**

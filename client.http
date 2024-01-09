@@ -8,11 +8,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imhhe
 }
 // staff registration
 ###
-POST https://yatvms.azurewebsites.net/register-staff-no
+POST https://yatvms.azurewebsites.net/register-staff-no-auth
 Content-Type: application/json
 
 {
-  "username": "example",
+  "username": "example0",
   "password": "123"
 }
 // staff registration without approval

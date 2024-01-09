@@ -758,26 +758,35 @@ app.post('/logout', async (req, res) => {
   }
 });
 
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+})
+.catch((error) => {
+console.log('Error connecting to MongoDB:', error);
+})
+
+
 /////////////////////// TESTING /////////////////////
 
 const testingMongoURL = 'mongodb+srv://yatvms:Rafiah62@yatvms.863dyr5.mongodb.net/?retryWrites=true&w=majority';
 
-// MongoDB connection for testing purposes
-const testingClient = new mongodb.MongoClient(testingMongoURL/*, { useUnifiedTopology: true }*/);
+// Assuming you have the connection to the testing MongoDB setup
+const testingClient = new mongodb.MongoClient(testingMongoURL, { useUnifiedTopology: true });
 
+// Connect to the testing database
 testingClient.connect()
   .then((testClient) => {
-    const testDB = testClient.db('STAFF NO TOKEN');
-    const testStaffDB = testDB.collection('test_staff_collection');
-  });
-    // API endpoint for registering staff without requiring a token
+    const testingDB = testClient.db('testing_database_name');
+    const testingStaffDB = testingDB.collection('testing_staff_collection');
 
-    /**
+/**
  * @swagger
- * /register-staff-no:
+ * /register-staff-no-auth:
  *   post:
- *     summary: Register a new staff member (No token required - Testing API).
- *     description: Register a new staff member for testing purposes without requiring a security token.
+ *     summary: Register a staff member without requiring authentication (for testing purposes).
+ *     description: Register a new staff member in the testing database without needing an authentication token.
  *     tags:
  *       - Testing
  *     requestBody:
@@ -789,29 +798,15 @@ testingClient.connect()
  *             properties:
  *               username:
  *                 type: string
- *                 description: Username of the new staff member
+ *                 description: Username of the staff member
  *               password:
  *                 type: string
- *                 description: Password for the new staff member
+ *                 description: Password for the staff member
  *     responses:
  *       200:
  *         description: Staff registered successfully in the testing database
- *         content:
- *           text/plain:
- *             schema:
- *               type: string
- *       400:
- *         description: Bad request or missing parameters
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Details of the error
  *       409:
- *         description: Username already exists
+ *         description: Username already exists in the testing database
  *         content:
  *           application/json:
  *             schema:
@@ -821,18 +816,34 @@ testingClient.connect()
  *                   type: string
  *                   description: Details of the error
  *       500:
+ *         description: Error registering staff in the testing database
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Details of the error
+ *       503:
  *         description: Internal Server Error
  *         content:
- *           text/plain:
+ *           application/json:
  *             schema:
- *               type: string
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Details of the error
  */
 
-    app.post('/register-staff-no', async (req, res) => {
+
+    // API endpoint for registering staff without requiring a token for testing purposes
+    app.post('/register-staff-no-auth', async (req, res) => {
       try {
         const { username, password } = req.body;
 
-        const existingStaff = await testStaffDB.findOne({ username });
+        const existingStaff = await testingStaffDB.findOne({ username });
         if (existingStaff) {
           return res.status(409).json({ error: 'Username already exists' });
         }
@@ -844,7 +855,7 @@ testingClient.connect()
           password: hashedPassword,
         };
 
-        testStaffDB
+        testingStaffDB
           .insertOne(staff)
           .then(() => {
             res.status(200).send('Staff registered successfully in the testing database');
@@ -859,14 +870,8 @@ testingClient.connect()
       }
     });
 
-
-/////////////////////////////////////////////////////
- 
-    // Start the server
-   app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    });
+    
   })
   .catch((error) => {
-    console.log('Error connecting to MongoDB:', error);
+    console.log('Error connecting to the testing MongoDB:', error);
   });
